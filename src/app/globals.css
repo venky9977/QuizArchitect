@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  /* --background-rgb: 214, 219, 220; */
+  --background-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 0, 0, 0;
+    /* --background-start-rgb: 214, 219, 220; */
+    --background-rgb: 255, 255, 255;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+.poppins{
+  font-family: var(--font-poppins);
+}
+
+.poppins-regular{
+  font-weight: 400; /* regular weight */
+}
+
+.poppins-light{
+   font-weight: 300; /* light weight */
+}
+
+.poppins-thin{
+  font-weight: 100; /* thin weight */
+}
+
+.poppins-semibold{
+  font-weight: 600; /* semibold weight */
+}
+
+.poppins-bold{
+  font-weight: 700; /* bold weight */
+}
