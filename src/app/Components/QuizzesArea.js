@@ -4,7 +4,9 @@ import React from "react";
 import QuizCard from './QuizCard';
 import PlaceHolder from "./PlaceHolder";
 import useGlobalContextProvider from "../ContextApi";
-
+import Image from "next/image";
+// import { Router } from "next/router";
+import { useRouter } from "next/navigation";
 function QuizzesArea({props}){
     const {allQuizzes} = useGlobalContextProvider();
 
@@ -26,6 +28,20 @@ function QuizzesArea({props}){
                             <QuizCard singleQuiz={singleQuiz} />
                             </div>
                         ))}
+                        </div>
+                        <div
+                            onClick={() => Router.push('/quiz-build')}
+                            className="cursor-pointer justify-center items-center rounded-[-10px] w-[230px] flex flex-col gap-2 border border-gray-100 bg-white p-4"
+                        >
+                            <Image
+                                src={'/add-quiz.png'}
+                                width={160}
+                                height={160}
+                                alt=""
+                            />
+                            <span className="select-none opacity-40">
+                                Add a New Quiz
+                            </span>
                         </div>
                     </div>
                     )}
