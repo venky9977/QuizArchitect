@@ -7,7 +7,7 @@ import useGlobalContextProvider from "@/app/ContextApi";
 
 
 
-function QuizStartHeader(props) {
+function QuizStartHeader({parentTimer}) {
     const {quizToStartObject} = useGlobalContextProvider();
     const {selectQuizToStart} = quizToStartObject;
     //extracting info from selectquiztostart
@@ -41,7 +41,7 @@ function QuizStartHeader(props) {
                     icon={faStopwatch}
                 />
 
-                <span>00:00:30</span>
+                <span>00:00:{parentTimer}</span>
             </div>
         </div>
     );
