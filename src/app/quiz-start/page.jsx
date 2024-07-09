@@ -2,7 +2,7 @@
 
 import { faCode,faStopwatch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import useGlobalContextProvider from "@/app/ContextApi";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -12,6 +12,7 @@ import QuizStartQuestions from "@/app/Components/QuizStartPage/QuizStartQuestion
 function Page(props) {
     const { allQuizzes, quizToStartObject } = useGlobalContextProvider();
     const { selectQuizToStart } = quizToStartObject;
+    const [parentTimer, setParentTimer] = useState(5);
     const router = useRouter();
 
     useEffect(() => {
@@ -19,6 +20,11 @@ function Page(props) {
             router.push('/');
         }
     }, []);
+
+    function onUpdateTime(currentTime)
+    {
+        setParentTimer(currentTime);
+    }
     
     return(
         <div className="poppins flex flex-col px-24 mt-[35px]">
@@ -34,9 +40,9 @@ function Page(props) {
                 </div>
             ) : (
                 <>
-                    <QuizStartHeader />
+                    <QuizStartHeader parentTimer={parentTimer} />
                     <div className="mt-10 flex items-center justify-center">
-                        <QuizStartQuestions />
+                        <QuizStartQuestions onUpdateTime={onUpdateTime} />
                     </div>
                 </>
             )}
