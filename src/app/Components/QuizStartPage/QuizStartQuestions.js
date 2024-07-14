@@ -4,9 +4,10 @@ import React, {useEffect, useReducer, useState} from 'react';
 import useGlobalContextProvider from '@/app/ContextApi';
 import { useRouter } from 'next/router';
 import toast,  {Toaster} from 'react-hot-toast';
+
 function QuizStartQuestions({onUpdateTime}){
     const time=15;
-    const {quizToStartObject,allQuizzes, setAllQuizzes} = useGlobalContextProvider();
+    const {quizToStartObject, allQuizzes, setAllQuizzes} = useGlobalContextProvider();
     const {selectQuizToStart} = quizToStartObject;
     const {quizQuestions} = selectQuizToStart;
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -16,6 +17,7 @@ function QuizStartQuestions({onUpdateTime}){
     const [score, setScore] = useState(0);
     
     const [timer, setTimer] = useState(time);
+
     let interval;
 
     function startTimer() {
@@ -40,7 +42,7 @@ function QuizStartQuestions({onUpdateTime}){
         return () => {
             clearInterval(interval);
         };
-    }, {currentQuestionIndex});
+    }, [currentQuestionIndex]);
 
     useEffect(() => {
         if(timer===0 && !isQuizEnded)
@@ -52,7 +54,7 @@ function QuizStartQuestions({onUpdateTime}){
             
             setAllQuizzes(currentQuizzes);
             // ----------------
-            if(currentQuestionIndex!=quizQuestions.length - 1)
+            if(currentQuestionIndex !== quizQuestions.length - 1)
             {
                 setTimeout(() => {
                    setCurrentQuestionIndex((current) =>{
@@ -64,7 +66,7 @@ function QuizStartQuestions({onUpdateTime}){
                 clearInterval(interval);
             }
         }
-    }, [1000]);
+    }, [timer]);
 
     // console.log(allQuizzes);
     // useEffect(() => {
@@ -115,20 +117,23 @@ function QuizStartQuestions({onUpdateTime}){
         setSelectedChoice(choiceIndexClicked);
 
         //we update the answerResult property in the allQuizzes array
-        const currentAllQuizzes=[...allQuizzes];
+        const currentAllQuizzes = [...allQuizzes];
 
-        currentAllQuizzes[indexOfQuizSelected].quizQuestions[currentQuestionIndex].answeredResult=choiceIndexClicked;
+        currentAllQuizzes[indexOfQuizSelected].quizQuestions[currentQuestionIndex].answeredResult = choiceIndexClicked;
 
         setAllQuizzes(currentAllQuizzes);
         //------------------------------------- 
     }
 
     function moveToTheNextQuestion() {
+        // Chcek if we did select the answer by using the answerResult property if it's still equal to -1k
         if(allQuizzes[indexOfQuizSelected].quizQuestions[currentQuestionIndex].answeredResult===-1)
         {
-            toast.error('Please select a answer.');
+            toast.error('Please select an answer.');
             return;
         }
+
+        // console.log(indexOfQuizSelected);
         // Update the statistics of the question
         // ====================================
         // Update the total attempts
@@ -136,11 +141,11 @@ function QuizStartQuestions({onUpdateTime}){
         allQuizzes[indexOfQuizSelected].quizQuestions[currentQuestionIndex].statistics.totalAttempts += 1;
 
         // if the answer is incorrect
-        if(allQuizzes[indexOfQuizSelected].quizQuestions[currentQuestionIndex].answeredResult != allQuizzes[indexOfQuizSelected].quizQuestions[currentQuestionIndex].correctAnswer)
+        if(allQuizzes[indexOfQuizSelected].quizQuestions[currentQuestionIndex].answeredResult !== allQuizzes[indexOfQuizSelected].quizQuestions[currentQuestionIndex].correctAnswer)
         {
             // Update the incorrect attempts
             allQuizzes[indexOfQuizSelected].quizQuestions[currentQuestionIndex].statistics.incorrectAttempts += 1;
-            toast.error('Inncorrect Answer');
+            toast.error('Incorrect Answer');
             //return;
 
             // if the answer is incorrect, go to the next question only
@@ -174,7 +179,7 @@ function QuizStartQuestions({onUpdateTime}){
 
         // This will stop the timer and end the quiz when currentQuestionIndex is the last
         // and only if we select the correct otherwise the timer is still running
-        if(currentQuestionIndex==quizQuestions.length - 1 && allQuizzes[indexOfQuizSelected].quizQuestions[currentQuestionIndex].answeredResult === allQuizzes[indexOfQuizSelected].quizQuestions[currentQuestionIndex].correctAnswer)
+        if(currentQuestionIndex === quizQuestions.length - 1 && allQuizzes[indexOfQuizSelected].quizQuestions[currentQuestionIndex].answeredResult === allQuizzes[indexOfQuizSelected].quizQuestions[currentQuestionIndex].correctAnswer)
             {
                 setTimer(0);
                 clearInterval(interval);
@@ -209,7 +214,7 @@ function QuizStartQuestions({onUpdateTime}){
             />
             
             {/* The Questions Part */}
-            <div className="flex justify-center items-center gap-2">
+            <div className="flex items-center gap-2">
                 <div className="bg-green-700 flex justify-center items-center rounded-md w-11 h-11 text-white p-3">
                     {currentQuestionIndex + 1}
                 </div>
@@ -229,7 +234,6 @@ function QuizStartQuestions({onUpdateTime}){
                             className={`p-3 ml-11 w-10/12 border border-green-700 rounded-md hover:bg-green-700 hover:text-white transition-all select-none ${selectedChoice===indexChoice? 'bg-green-700 text-white'
                                 : 'bg-white'
                             }`}
-
                         >
                             {choice}
                         </div>
@@ -244,7 +248,8 @@ function QuizStartQuestions({onUpdateTime}){
                         moveToTheNextQuestion();
                     }}
                     disabled={isQuizEnded ? true : false}
-                    className="p-2 px-5 text-[15px] text-white rounded-md bg-green-700 mr-[100px]">
+                    className={`p-2 px-5 text-[15px] text-white rounded-md bg-green-700 mr-[70px] ${ isQuizEnded? 'opacity-60' : 'opacity-100' }`}
+                    >
                     SUBMIT
                 </button>
             </div>
@@ -283,9 +288,9 @@ function ScoreComponent({quizStartParentProps}) {
 
     function emojiIconScore() {
         const emojiFaces = [
-            'confused-emoji.png',
-            'happy-emoji.png',
-            'very-happy-emoji.png'
+            'confused-emoji.jpg',
+            'happy-emoji.jpg',
+            'star-eyes-emoji.jpg'
         ];
         const result = (score / selectQuizToStart.quizQuestions.length) * 100;
         if (result < 25){
@@ -303,7 +308,7 @@ function ScoreComponent({quizStartParentProps}) {
 
     function tryAgainFunction() {
         setIsQuizEnded(false);
-        const newQuizIndex = allQuizzes.findIndex((quiz) => quiz.id==selectQuizToStart.id,);
+        const newQuizIndex = allQuizzes.findIndex((quiz) => quiz.id === selectQuizToStart.id,);
         setIndexOfQuizSelected(newQuizIndex);
         setCurrentQuestionIndex(0);
         setSelectedChoice(null);
@@ -316,25 +321,31 @@ function ScoreComponent({quizStartParentProps}) {
             {/* Score */}
             <div className = "flex gap-4 items-center justify-center flex-col">
                 <Image src={`/${emojiIconScore()}`} alt="" width={100} height={100} />
-                <div className='text-[-22px] text-center'>
-                    {score}/{numberOfQuestions}
+                <div className='flex gap-1 flex-col'>
+                    <span className='font-bold text-2xl'>Your Score</span>
+                    <div className='text-[-22px] text-center'>
+                        {score}/{numberOfQuestions}
+                    </div>
                 </div>
-            </div>
-            <button
-                onClick={() => tryAgainFunction()}
-                className='p-2 bg-green-700 rounded-md text-white px-6'
-            >
-                Try Again
-            </button>
-            {/* Statistics */}
-            <div className='w-full flex gap-2 flex-col mt-3'>
-                <div className='flex gap-1 items-center justify-center'>
-                    <Image src="/correct-answer.png" alt="" width={20} height={20} />
-                    <span className='text-[14px]'>Correct Answers: {score}</span>
-                </div>
-                <div className='flex gap-1 items-center justify-center'>
-                    <Image src="/incorrect-answer.png" alt="" width={20} height={20} />
-                    <span className='text-[14px]'>Incorrect Answers: {selectQuizToStart.quizQuestions.length - score}</span>
+                <button
+                    onClick={() => tryAgainFunction()}
+                    className='p-2 bg-green-700 rounded-md text-white px-6'
+                >
+                    Try Again
+                </button>
+                {/* Statistics */}
+                <div className='w-full flex gap-2 flex-col mt-3'>
+                    <div className='flex gap-1 items-center justify-center'>
+                        <Image src="/correct-answer.png" alt="" width={20} height={20} />
+                        <span className='text-[14px]'>Correct Answers: {score}</span>
+                    </div>
+                    <div className='flex gap-1 items-center justify-center'>
+                        <Image src="/incorrect-answer.png" alt="" width={20} height={20} />
+                        <span className='text-[14px]'>
+                            Incorrect Answers: 
+                            {selectQuizToStart.quizQuestions.length - score}
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>

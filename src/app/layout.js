@@ -2,15 +2,13 @@ import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
 import { ContextProvider } from "./ContextApi";
 import Navbar from "./Components/Navbar";
-import QuizzesArea from "./Components/QuizzesArea";
-import QuizCard from "./Components/QuizCard";
 
 const inter = Inter({ subsets: ["latin"] });
 
-const poppins = Poppins ({
+const poppins = Poppins({
   subsets: ['latin'],
   variable: '--font-poppins',
-  weight: ['100', '200','300','400','500','600','700','800','900'],
+  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
 });
 
 export const metadata = {
@@ -24,12 +22,12 @@ export default function RootLayout({ children }) {
       <head>
         <title>Quiz Architect</title>
       </head>
-
       <body className={poppins.variable}>
         <ContextProvider>
+          <Navbar />
           <main>{children}</main>
         </ContextProvider>
-        </body>
+      </body>
     </html>
   );
 }
