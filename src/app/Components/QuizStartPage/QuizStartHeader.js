@@ -6,7 +6,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import useGlobalContextProvider from "@/app/ContextApi";
 
 
-
 function QuizStartHeader({parentTimer}) {
     const {quizToStartObject} = useGlobalContextProvider();
     const {selectQuizToStart} = quizToStartObject;

@@ -20,8 +20,8 @@ export const quizzesData = [
                 //B. to add interactivity
                 answeredResult: -1,
                 statistics: {
-                    totalAttempts: 3,
-                    correctAttempts: 3,
+                    totalAttempts: 0,
+                    correctAttempts: 0,
                     incorrectAttempts: 0,
                 },
             },
