@@ -4,13 +4,14 @@ import React, {useEffect, useRef, useState} from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCode } from "@fortawesome/free-solid-svg-icons";
 
-function QuizBuildTitle({focusProp}) {
+function QuizBuildTitle({focusProp, onChangeQuizTitle}) {
     const [quizTitle, setQuizTitle] = useState('');
     const {focus, setFocusFirst} = focusProp;
     const quizTitleRef = useRef(null);
     
     function handleTextInputChange(text){
         setQuizTitle(text);
+        onChangeQuizTitle(text);
     }
 
     useEffect(() => {

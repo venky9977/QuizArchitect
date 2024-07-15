@@ -2,11 +2,13 @@
 
 import { faXmark, prefix } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { v4 as uuidv4 } from 'uuid';
+
+
 import React, { useEffect, useState, useRef, createRef, forwardRef, useLayoutEffect } from "react";
 import useGlobalContextProvider from "@/app/ContextApi";
 import toast, { Toaster } from "react-hot-toast";
 import Choices from "./Choices";  // Import Choices
+import { text } from "@fortawesome/fontawesome-svg-core";
 
 function QuizBuildQuestions({ focusProp }) {
     const prefixes = ['A', 'B', 'C', 'D'];
@@ -97,6 +99,14 @@ function QuizBuildQuestions({ focusProp }) {
         setQuizQuestions(updatedQuestions);
     }
 
+    function updateCorrectAnswer(text, questionIndex){
+        const correctAnswersArray = ['A', 'B', 'C', 'D'];
+        console.log(correctAnswersArray.indexOf(text));
+        const QuestionsCopy = [...quizQuestions];
+        QuestionsCopy[questionIndex].CorrectAnswer = text;
+        setQuizQuestions(QuestionsCopy);
+    }
+    
     useLayoutEffect(() => {
         if (endOfListRef.current) {
             console.log(endOfListRef);
@@ -169,6 +179,12 @@ function QuizBuildQuestions({ focusProp }) {
                                 }}
                             />
                         )}
+
+                        <CorrectAnswer
+                            onChangeCorrectAnswer={(text) => {
+                                updateCorrectAnswer(text, questionIndex);
+                            }}
+                        />
                     </div>
                 ))}
 
@@ -188,6 +204,40 @@ function QuizBuildQuestions({ focusProp }) {
     );
 }
 export default QuizBuildQuestions;
+
+function CorrectAnswer({ onChangeCorrectAnswer, singleQuestion}){
+    const {CorrectAnswerInput, setCorrectAnswerInput} = useState('');
+
+    function handleOnChangeInput(text) {
+        const upperText = text.toUpperCase();
+        for(const choice of singleQuestion.choices){
+            const eachChoice = choice.substring(0, 1);
+
+            if( eachChoice === upperText || upperText === ''){
+                console.log(upperText);
+                console.log(eachChoice);
+                setCorrectAnswerInput(upperText);
+                onChangeCorrectAnswer(upperText);
+            }
+        }
+    }
+    // Code below, the onChange loop, is incomplete, please complete it.
+    return (
+        <div className=" flex gap-1 items-center mt-3">
+            <div className="text-[15px]">Correct Answer</div>
+            <div className="border border-gray-200 rounded-md p-1 w-full ">
+                 
+                <input
+                    value={CorrectAnswerInput}
+                    maxLength={1}
+                    onChange={(e) => {
+
+                    }}
+                />
+            </div>
+        </div>
+    )
+}
 
 const SingleQuestion = forwardRef(function SingleQuestion(
     { questionIndex, value, onChange },
