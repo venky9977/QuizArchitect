@@ -20,11 +20,30 @@ function successRate(singleQuiz) {
 }
 
 function QuizCard({ singleQuiz }) {
-  const { quizToStartObject } = useGlobalContextProvider();
+  const { quizToStartObject, dropDownToggleObject, threeDotsPositionsObject } = useGlobalContextProvider();
+  const {setDropDownToggle} = dropDownToggleObject;
+  //------------------------------------------------
   const { setSelectQuizToStart } = quizToStartObject;
+  const { setThreeDotsPositions } = threeDotsPositionsObject;
   const { quizTitle, quizQuestions, icon } = singleQuiz;
+  //-------------------------------------------------
   const totalQuestions = quizQuestions.length;
   const globalSuccessRate = successRate(singleQuiz);
+
+  function openDropDownMenu(event) {
+
+    const xPos= event.clientX;
+    const yPos= event.clientY;
+
+    setThreeDotsPositions({x: xPos, y: yPos});
+
+    if(event) {
+      console.log(event);
+      event.stopPropagation();
+    }
+
+    setDropDownToggle(true);
+  }
 
   return (
     <div className="rounded-[10px] flex flex-col gap-2 border border-gray-300 bg-white p-4">
@@ -37,6 +56,7 @@ function QuizCard({ singleQuiz }) {
             height={13}
             width={13}
             icon={faEllipsis}
+            onClick={openDropDownMenu}
           />
         </div>
         {/* Quiz icon */}

@@ -6,21 +6,23 @@ import PlaceHolder from "./PlaceHolder";
 import useGlobalContextProvider from "../ContextApi";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import DropDown from "./DropDown";
 
 function QuizzesArea({ props }) {
   const { allQuizzes, userObject } = useGlobalContextProvider(); // Ensure userObject is destructured here
-  const { user } = userObject; // Destructure user from userObject
+  const { user,setUser } = userObject; // Destructure user from userObject
   const router = useRouter();
 
   return (
     <div className="poppins mx-12 mt-10">
       <div>
-        {user.isLogged && (
+        {/*user.isLogged &&*/ (
           <>
             {allQuizzes.length === 0 ? (
               <PlaceHolder />
             ) : (
               <div>
+                <DropDown />
                 <h2 className="text-xl font-bold">My Quizzes</h2>
                 <div className="mt-6 flex gap-2 flex-wrap">
                   <div className="flex gap-2 flex-wrap">

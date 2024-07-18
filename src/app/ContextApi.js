@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { quizzesData } from "./QuizzesData";
+import { faQuestion } from "@fortawesome/free-solid-svg-icons";
 
 const GlobalContext = createContext();
 
@@ -16,7 +17,14 @@ export function ContextProvider({ children }) {
     const [allQuizzes, setAllQuizzes] = useState([]);
     const [selectQuizToStart, setSelectQuizToStart] = useState(null);
     const [user, setUser] = useState(defaultUser);
+    const [openIconBox, setOpenIconBox] = useState(false);
+    const [selectedIcon, setSelectedIcon] = useState({ faIcon: faQuestion});
 
+    const[dropDownToggle, setDropDownToggle] = useState(false);
+    const [threeDotsPositions, setThreeDotsPositions] = useState({ x:0, y:0 });
+
+    const [selectedQuiz, setSelectedQuiz] = useState(null);
+    
     useEffect(() => {
         if (typeof window !== 'undefined') {
             const savedUserData = localStorage.getItem('user');
@@ -43,6 +51,11 @@ export function ContextProvider({ children }) {
                 setAllQuizzes,
                 quizToStartObject: { selectQuizToStart, setSelectQuizToStart },
                 userObject: { user, setUser },
+                openBoxToggle: {openIconBox, setOpenIconBox},
+                selectedIconObject: {selectedIcon, setSelectedIcon},
+                dropDownToggleObject: { dropDownToggle, setDropDownToggle},
+                threeDotsPositionsObject: { threeDotsPositions, setThreeDotsPositions},
+                selectedQuizObject: { selectedQuiz, setSelectedQuiz },
             }}
         >
             {children}

@@ -3,11 +3,15 @@
 import React, {useEffect, useRef, useState} from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCode } from "@fortawesome/free-solid-svg-icons";
+import useGlobalContextProvider from "@/app/ContextApi";
 
 function QuizBuildTitle({focusProp}) {
     const [quizTitle, setQuizTitle] = useState('');
-    const {focus, setFocusFirst} = focusProp;
+    const {focus} = focusProp;
     const quizTitleRef = useRef(null);
+    const {openBoxToggle, selectedIconObject} = useGlobalContextProvider();
+    const {setOpenIconBox} = openBoxToggle;
+    const {selectedIcon} = selectedIconObject;
     
     function handleTextInputChange(text){
         setQuizTitle(text);
@@ -37,7 +41,10 @@ function QuizBuildTitle({focusProp}) {
                 />
             </div>
             <FontAwesomeIcon
-                icon={faCode}
+            onClick={() => {
+                setOpenIconBox(true);
+                }}
+                icon={selectedIcon.faIcon}
                 height={40}
                 width={40}
                 className="text-white p-2 rounded-md bg-green-700 cursor-pointer"
