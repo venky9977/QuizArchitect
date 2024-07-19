@@ -2,21 +2,30 @@
 
 import { faXmark, prefix } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+<<<<<<< Updated upstream
 import { v4 as uuidv4 } from 'uuid';
+=======
+>>>>>>> Stashed changes
 import React, { useEffect, useState, useRef, createRef, forwardRef, useLayoutEffect } from "react";
 import useGlobalContextProvider from "@/app/ContextApi";
 import toast, { Toaster } from "react-hot-toast";
 import Choices from "./Choices";  // Import Choices
+<<<<<<< Updated upstream
+=======
+import { text } from "@fortawesome/fontawesome-svg-core";
+import { v4 as uuidv4 } from 'uuid';
+>>>>>>> Stashed changes
 
-function QuizBuildQuestions({ focusProp }) {
+function QuizBuildQuestions({ focusProp, quizQuestions, setQuizQuestions }) {
     const prefixes = ['A', 'B', 'C', 'D'];
-    const [quizQuestions, setQuizQuestions] = useState([
-        { 
-            id: uuidv4(), 
-            mainQuestion: '', 
-            choices: prefixes.slice(0,2).map((prefix) => prefix + '. '),
-        },
-    ]);
+    // const [quizQuestions, setQuizQuestions] = useState([
+    //     { 
+    //         id: uuidv4(), 
+    //         mainQuestion: '', 
+    //         choices: prefixes.slice(0,2).map((prefix) => prefix + '. '),
+    //         correctAnswer: '',
+    //     },
+    // ]);
 
     const { focus, setFocusFirst } = focusProp;
     const endOfListRef = useRef(null);
@@ -36,13 +45,37 @@ function QuizBuildQuestions({ focusProp }) {
             textAreaRefs.current[lastIndexQuizQuestions].current.focus();
             return;
         }
+        
+
+        //This code checks if all the previous choices input are not empty
+        for(const choice of quizQuestions[lastIndexQuizQuestions].choices) {
+            const singleChoice = choice.substring(2);
+            if(singleChoice.trim(' ').length === 0) {
+                return toast.error(
+                    `Please ensure that all previous choices are filled out!`,
+                );
+            }
+        }
+
+        //This code checks out if the correct answer input is not empty
+        if (quizQuestions[lastIndexQuizQuestions].correctAnswer.length === 0){
+            return toast.error(`Please ensure to fill out the correct answer!`);
+        }
 
         //This code create a new question object and add it to the quiz questions array
         const newQuestion = { 
             id: uuidv4(), 
             mainQuestion: '',
             choices: prefixes.slice(0,2).map((prefix) => prefix + ' '),
+            correctAnswer: '',
+            answeredResult: -1,
+            statistics: {
+                totalAttempts: 0,
+                correctAttempts: 0,
+                incorrectAttempts: 0,
+            },
          };
+         
         setQuizQuestions([...quizQuestions, newQuestion]);
         textAreaRefs.current = [...textAreaRefs.current, createRef()];
     }
@@ -73,10 +106,10 @@ function QuizBuildQuestions({ focusProp }) {
         setQuizQuestions(updatedQuestions);
     }
 
-    function updateTheChoicesAray(text, choiceIndex, questionIndex){
-        console.log('text', text);
-        console.log('choiceIndex', choiceIndex);
-        console.log('questionIndex', questionIndex);
+    function updateTheChoicesArray(text, choiceIndex, questionIndex){
+        // console.log('text', text);
+        // console.log('choiceIndex', choiceIndex);
+        // console.log('questionIndex', questionIndex);
 
         const updatedQuestions = quizQuestions.map((question, i) => {
             if(questionIndex===i){
@@ -97,6 +130,17 @@ function QuizBuildQuestions({ focusProp }) {
         setQuizQuestions(updatedQuestions);
     }
 
+<<<<<<< Updated upstream
+=======
+    function updateCorrectAnswer(text, questionIndex){
+        const correctAnswersArray = ['A', 'B', 'C', 'D'];
+        //console.log(correctAnswersArray.indexOf(text));
+        const questionsCopy = [...quizQuestions];
+        questionsCopy[questionIndex].correctAnswer = correctAnswersArray.indexOf(text);
+        setQuizQuestions(questionsCopy);
+    }
+    
+>>>>>>> Stashed changes
     useLayoutEffect(() => {
         if (endOfListRef.current) {
             console.log(endOfListRef);
@@ -153,7 +197,7 @@ function QuizBuildQuestions({ focusProp }) {
                             quizQuestions={quizQuestions}
                             setQuizQuestions={setQuizQuestions}
                             onChangeChoice={(text, choiceIndex, questionIndex) => {
-                                updateTheChoicesAray(text, choiceIndex, questionIndex);
+                                updateTheChoicesArray(text, choiceIndex, questionIndex);
                             }}
                             value={singleQuestion.choices}
                             prefixes={prefixes}
@@ -169,6 +213,16 @@ function QuizBuildQuestions({ focusProp }) {
                                 }}
                             />
                         )}
+<<<<<<< Updated upstream
+=======
+
+                        <CorrectAnswer
+                            onChangeCorrectAnswer={(text) => {
+                                updateCorrectAnswer(text, questionIndex);
+                            }}
+                            singleQuestion={singleQuestion}
+                        />
+>>>>>>> Stashed changes
                     </div>
                 ))}
 
@@ -189,6 +243,51 @@ function QuizBuildQuestions({ focusProp }) {
 }
 export default QuizBuildQuestions;
 
+<<<<<<< Updated upstream
+=======
+function CorrectAnswer({ onChangeCorrectAnswer, singleQuestion}){
+    const [correctAnswerInput, setCorrectAnswerInput] = useState('');
+
+    function handleOnChangeInput(text) {
+        const upperText = text.toUpperCase();
+        
+        // if(upperText === '' || ['A','B','C','D'].includes(upperText)) {
+        //     setCorrectAnswerInput(upperText);
+        //     onChangeCorrectAnswer(upperText);
+        // }
+
+        for(const choice of singleQuestion.choices){
+            const eachChoice = choice.substring(0, 1);
+
+            if( eachChoice === upperText || upperText === ''){
+                console.log(upperText);
+                console.log(eachChoice);
+                setCorrectAnswerInput(upperText);
+                onChangeCorrectAnswer(upperText);
+            }
+        }
+    }
+    
+    return (
+        <div className=" flex gap-1 items-center mt-3">
+            <div className="text-[15px]">Correct Answer</div>
+            <div className="border border-gray-200 rounded-md p-1 w-full ">
+                 
+                <input
+                    value={correctAnswerInput}
+                    maxLength={1}
+                    onChange={(e) => {
+                        handleOnChangeInput(e.target.value);
+                    }}
+                    className="p-3 outline-none w-full text-[13px]"
+                    placeholder="Add the correct answer..."
+                />
+            </div>
+        </div>
+    );
+}
+
+>>>>>>> Stashed changes
 const SingleQuestion = forwardRef(function SingleQuestion(
     { questionIndex, value, onChange },
     ref
