@@ -7,9 +7,15 @@ import QuizBuildQuestions from '../Components/QuizBuildPage/QuizBuildQuestions'
 import { icon } from "@fortawesome/fontawesome-svg-core";
 import { faCode } from "@fortawesome/free-solid-svg-icons";
 import { v4 as uuidv4 } from 'uuid';
+import useGlobalContextProvider from "../ContextApi";
 
 function Page(props){
-    
+    const prefixes = ['A', 'B', 'C', 'D'];
+    //const { selectedIconObject, selectedIconObject } = useGlobalContextProvider();
+    const { selectedIcon } = selectedIconObject;
+    const { selectedQuiz } = selectedQuizObject;
+    const { focusFirst, setFocusFirst } = useState(true);
+
     const [newQuiz, setNewQuiz] = useState({
         id: uuidv4(),
         icon: faCode, 
@@ -24,7 +30,7 @@ function Page(props){
         }))
     }, {quizQuestions});
 
-    const [focusFirst, setFocusFirst] = useState(true);
+    //const [focusFirst, setFocusFirst] = useState(true);
 
     function onChangeQuizTitle(text){
         setNewQuiz((prevQuiz) => ({ ...prevQuiz, quizTitle, text }));

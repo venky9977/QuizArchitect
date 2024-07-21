@@ -20,11 +20,41 @@ function successRate(singleQuiz) {
 }
 
 function QuizCard({ singleQuiz }) {
-  const { quizToStartObject } = useGlobalContextProvider();
+  const {
+    quizToStartObject,
+    dropDownToggleObject,
+    threeDotsPositionsObject,
+    selectedQuizObject,
+  } = useGlobalContextProvider();
+  const { setDropDownToggle } = dropDownToggleObject;
+  //
   const { setSelectQuizToStart } = quizToStartObject;
+  const { setThreeDotsPositions } = threeDotsPositionsObject;
+  const { selectedQuiz, setSelectedQuiz } = selectedQuizObject;
+  //
+  //const { quizToStartObject } = useGlobalContextProvider();
+  //const { setSelectQuizToStart } = quizToStartObject;
   const { quizTitle, quizQuestions, icon } = singleQuiz;
   const totalQuestions = quizQuestions.length;
   const globalSuccessRate = successRate(singleQuiz);
+
+  function openDropDownMenu(event){
+    const xpos = event.clientX;
+    const ypos = event.clientY;
+
+    setThreeDotsPositions({ x: xpos, y: ypos});
+
+    if(event){
+      console.log(event);
+      event.stopPropagation();
+    }
+
+    setDropDownToggle(true);
+    setSelectedQuiz(singleQuiz);
+  }
+
+
+  console.log(selectedQuiz);
 
   return (
     <div className="rounded-[10px] flex flex-col gap-2 border border-gray-300 bg-white p-4">
