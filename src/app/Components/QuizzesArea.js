@@ -9,14 +9,14 @@ import { useRouter } from "next/navigation";
 import DropDown from "./DropDown";
 
 function QuizzesArea({ props }) {
-  const { allQuizzes, userObject } = useGlobalContextProvider(); // Ensure userObject is destructured here
-  const { user,setUser } = userObject; // Destructure user from userObject
+  const { allQuizzes, userObject } = useGlobalContextProvider();
+  const { user, setUser } = userObject;
   const router = useRouter();
 
   return (
     <div className="poppins mx-12 mt-10">
       <div>
-        {/*user.isLogged &&*/ (
+        {user.isLogged ? (
           <>
             {allQuizzes.length === 0 ? (
               <PlaceHolder />
@@ -50,6 +50,23 @@ function QuizzesArea({ props }) {
               </div>
             )}
           </>
+        ) : (
+          <div className="h-96 flex flex-col gap-4 justify-center items-center">
+            <h2 className="font-bold text-5xl">
+              Learn 10x <span className="text-blue-700">Faster!</span>
+            </h2>
+            <span className="text-xl font-light">
+              Quiz Builder app
+            </span>
+            <button
+              onClick={() => {
+                setUser((prevUser) => ({...prevUser, isLogged:true}));
+              }}
+              className="p-4 bg-blue-700 text-white rounded-md"
+            >
+              Get Started Now!
+            </button>
+          </div>
         )}
       </div>
     </div>

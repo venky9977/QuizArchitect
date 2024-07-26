@@ -1,33 +1,46 @@
 'use client';
 
-import React, {useEffect, useRef, useState} from "react";
+import React, { useEffect, useRef, useState } from "react";
+import Image from "next/image"; // Ensure you import Image from next/image
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCode } from "@fortawesome/free-solid-svg-icons";
-import useGlobalContextProvider from "@/app/ContextApi";
+import useGlobalContextProvider from '@/app/ContextApi';
+import convertToFaIcons from "@/app/convertToFaIcons";
 
-function QuizBuildTitle({focusProp}) {
-    const [quizTitle, setQuizTitle] = useState('');
-    const {focus} = focusProp;
+function QuizBuildTitle({ focusProp, onChangeQuizTitle }) {
+    const { openBoxToggle, selectedIconObject, selectedQuizObject } = useGlobalContextProvider();
+    const { selectedQuiz } = selectedQuizObject;
+    const [quizTitle, setQuizTitle] = useState(() => selectedQuiz ? selectedQuiz.quizTitle : '');
+    const { focus } = focusProp;
     const quizTitleRef = useRef(null);
-    const {openBoxToggle, selectedIconObject} = useGlobalContextProvider();
-    const {setOpenIconBox} = openBoxToggle;
-    const {selectedIcon} = selectedIconObject;
-    
-    function handleTextInputChange(text){
+
+    const { openIconBox, setOpenIconBox } = openBoxToggle;
+    const { selectedIcon, setSelectedIcon } = selectedIconObject;
+
+    function handleTextInputChange(text) {
         setQuizTitle(text);
+        onChangeQuizTitle(text);
     }
 
     useEffect(() => {
-        if(focus){
+        if (focus) {
             quizTitleRef.current.focus();
+        }
+    }, []);
+
+    useEffect(() => {
+        if (typeof selectedIcon.faIcon === 'string') {
+            const newFaIcon = convertToFaIcons(selectedIcon.faIcon);
+            const copySelectedIcon = { ...selectedIcon };
+            copySelectedIcon.faIcon = newFaIcon;
+            setSelectedIcon(copySelectedIcon);
         }
     }, []);
 
     return (
         <div className="p-3 flex justify-between border border-green-700 rounded-md mr-10 ml-10">
             <div className="flex gap-2">
-                <div className="flex gp-2 items-center">
-                    <div className="bg-green-700 px-4 py-2 rounded-md text-white mr-10 ml-10">1</div>
+                <div className="flex gap-2 items-center">
+                    <div className="bg-green-700 px-4 py-2 rounded-md text-white">1</div>
                     <span className="font-bold">Quiz Name: </span>
                 </div>
                 <input
@@ -41,8 +54,8 @@ function QuizBuildTitle({focusProp}) {
                 />
             </div>
             <FontAwesomeIcon
-            onClick={() => {
-                setOpenIconBox(true);
+                onClick={() => {
+                    setOpenIconBox(true);
                 }}
                 icon={selectedIcon.faIcon}
                 height={40}

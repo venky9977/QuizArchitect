@@ -1,7 +1,5 @@
 'use client';
 
-import { faCode,faStopwatch } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
 import useGlobalContextProvider from "@/app/ContextApi";
 import { useRouter } from "next/navigation";
@@ -10,26 +8,25 @@ import QuizStartHeader from "@/app/Components/QuizStartPage/QuizStartHeader";
 import QuizStartQuestions from "@/app/Components/QuizStartPage/QuizStartQuestions";
 
 function Page(props) {
-    const { allQuizzes, quizToStartObject } = useGlobalContextProvider();
+    const { quizToStartObject } = useGlobalContextProvider();
     const { selectQuizToStart } = quizToStartObject;
     const [parentTimer, setParentTimer] = useState(5);
     const router = useRouter();
 
     useEffect(() => {
-        if(selectQuizToStart === null){
+        if (selectQuizToStart === null) {
             router.push('/');
         }
-    }, []);
+    }, [selectQuizToStart, router]);
 
-    function onUpdateTime(currentTime)
-    {
+    function onUpdateTime(currentTime) {
         setParentTimer(currentTime);
     }
-    
-    return(
+
+    return (
         <div className="poppins flex flex-col px-24 mt-[35px]">
             {selectQuizToStart === null ? (
-                <div className=" h-svh flex flex-col gap-2 items-center justify-center">
+                <div className="h-svh flex flex-col gap-2 items-center justify-center">
                     <Image src="/error-icon.png" alt="" width={180} height={180} />
                     <h2 className="text-xl font-bold">
                         Please Select your Quiz First.......

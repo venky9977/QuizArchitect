@@ -2,6 +2,7 @@ import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
 import { ContextProvider } from "./ContextApi";
 import Navbar from "./Components/Navbar";
+import { Toaster } from "react-hot-toast";  // Import Toaster
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,8 +25,9 @@ export default function RootLayout({ children }) {
       </head>
       <body className={poppins.variable}>
         <ContextProvider>
-          <Navbar />
+          {/* <Navbar /> */}
           <main>{children}</main>
+          <Toaster />  {/* Include Toaster here */}
         </ContextProvider>
       </body>
     </html>
