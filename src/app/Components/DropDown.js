@@ -1,30 +1,36 @@
 'use client';
 
-import {faL, faPencil,faTrash} from '@fortawesome/free-solid-svg-icons';
+import { faPencil, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import useGlobalContextProvider from '../ContextApi';
 import { useRouter } from 'next/navigation';
 
-function DropDown(props){
-    const {dropDownToggleObject, threeDotsPositionsObject, selectedQuizObject} = useGlobalContextProvider();
-    const {dropDownToggle, setDropDownToggle} = dropDownToggleObject;
+function DropDown(props) {
+    const {
+        dropDownToggleObject, 
+        threeDotsPositionsObject, 
+        selectedQuizObject,
+        allQuizzes,
+        setAllQuizzes,
+    } = useGlobalContextProvider();
+    const { dropDownToggle, setDropDownToggle } = dropDownToggleObject;
     const { threeDotsPositions } = threeDotsPositionsObject;
-    const { selectedQuiz, setSelectedQuiz} = selectedQuizObject;
+    const { selectedQuiz, setSelectedQuiz } = selectedQuizObject;
     const [isDialogOpened, setIsDialogOpened] = useState(false);
     const dropDownRef = useRef(null);
     const router = useRouter();
 
     const menuItems = [
-        { name: 'Modify', icon: faPencil},
-        { name: 'Delete', icon: faTrash},
+        { name: 'Modify', icon: faPencil },
+        { name: 'Delete', icon: faTrash },
     ];
 
     useEffect(() => {
-        function handleOutsideClick(event){
-            if(dropDownRef.current && !dropDownRef.current.contains(event.target)) {
-                if(!isDialogOpened) {
+        function handleOutsideClick(event) {
+            if (dropDownRef.current && !dropDownRef.current.contains(event.target)) {
+                if (!isDialogOpened) {
                     setSelectedQuiz(null);
                 }
                 setDropDownToggle(false);
@@ -32,12 +38,34 @@ function DropDown(props){
         }
         document.addEventListener('click', handleOutsideClick);
 
-        return() => {
+        return () => {
             document.removeEventListener('click', handleOutsideClick);
         };
-    }, [dropDownToggle]);
+    }, [dropDownToggle, isDialogOpened]);
 
-    console.log(selectedQuiz);
+    async function deleteTheQuiz() {
+        const updatedAllQuizzes = allQuizzes.filter((quiz) => quiz._id !== selectedQuiz._id);
+
+        const res = await fetch(
+            `http://localhost:3000/api/quizzes?id=${selectedQuiz._id}`,
+            {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            },
+        );
+
+        if (!res.ok) {
+            toast.error('Error while deleting the quiz');
+            return;
+        }
+
+        setAllQuizzes(updatedAllQuizzes);
+        toast.success('The Quiz has been deleted successfully.');
+        setIsDialogOpened(false);
+        setSelectedQuiz(null);
+    }
 
     function handleClickedItem(menuItem) {
         if (menuItem.name === 'Modify') {
@@ -50,30 +78,30 @@ function DropDown(props){
                 (t) => (
                     <div className='flex flex-col gap-4'>
                         <div>
-                            Do you really want to delete ({selectedQuiz.quizTitle}) Quiz?
+                            Do you really want to delete the quiz titled '({selectedQuiz.quizTitle})'?
                         </div>
                         <div className='w-full flex gap-3 justify-center'>
                             <button
                                 onClick={() => {
+                                    deleteTheQuiz();
                                     toast.dismiss(t.id);
                                 }}
-                                className='bg-green-700 text-white p-1 w-[100px] rounded-md'>
-                                    Yes
+                                className='bg-blue-700 text-white p-1 w-[100px] rounded-md'>
+                                Yes
                             </button>
                             <button
-                                className='bg-white text-green-700 p-1 w-[100px] border border-green-700 rounded-md hover:text-white hover:bg-green-700'
+                                className='bg-white text-blue-700 p-1 w-[100px] border border-blue-700 rounded-md hover:text-white hover:bg-blue-700'
                                 onClick={() => {
-                                    toast.dismiss(t.id);
                                     setIsDialogOpened(false);
-                                    setSelectedQuiz(null);
+                                    toast.dismiss(t.id);
                                 }}>
-                                    No
+                                No
                             </button>
                         </div>
                     </div>
                 ),
                 {
-                    duration:'10000',
+                    duration: 10000,
                     id: 'deleteQuiz',
                 },
             );
@@ -82,9 +110,9 @@ function DropDown(props){
         setDropDownToggle(false);
     }
 
-    return(
+    return (
         <div
-            style={{left: threeDotsPositions.x, top: threeDotsPositions.y }}
+            style={{ left: threeDotsPositions.x, top: threeDotsPositions.y }}
             ref={dropDownRef}
             className={`p-4 w-32 fixed z-50 shadow-md flex rounded-lg flex-col gap-3 bg-white poppins poppins-light text-[13px] ${
                 dropDownToggle ? 'visible' : 'invisible'
@@ -92,18 +120,15 @@ function DropDown(props){
         >
             {menuItems.map((menuItem, index) => (
                 <div
-                onClick={() => handleClickedItem(menuItem)}
+                    onClick={() => handleClickedItem(menuItem)}
                     key={index}
-                    className='flex gap-2 items-center border text-green-700 border-gray-200 rounded-md select-none
-                    cursor-pointer hover:text-white hover:bg-green-700'>
-                    
+                    className='flex gap-2 items-center p-2 border text-blue-700 border-gray-200 rounded-md select-none cursor-pointer hover:text-white hover:bg-blue-700'>
                     <FontAwesomeIcon className='size-4' icon={menuItem.icon} />
-                    <div className=''>{menuItem.name}</div>
+                    <div className="">{menuItem.name}</div>
                 </div>
             ))}
-
         </div>
-    )
+    );
 }
 
 export default DropDown;

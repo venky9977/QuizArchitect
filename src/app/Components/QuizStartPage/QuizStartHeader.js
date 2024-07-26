@@ -5,18 +5,16 @@ import { faCode, faStopwatch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import useGlobalContextProvider from "@/app/ContextApi";
 
+function QuizStartHeader({ parentTimer }) {
+    const { quizToStartObject } = useGlobalContextProvider();
+    const { selectQuizToStart } = quizToStartObject;
+    const { quizTitle } = selectQuizToStart;
+    const { quizQuestions } = selectQuizToStart;
 
-function QuizStartHeader({parentTimer}) {
-    const {quizToStartObject} = useGlobalContextProvider();
-    const {selectQuizToStart} = quizToStartObject;
-    //extracting info from selectquiztostart
-    const {quizTitle} = selectQuizToStart;
-    const {quizQuestions} = selectQuizToStart;
     return (
         <div className="flex justify-between">
-            {/* The quiz name  */}
             <div className=" flex gap-2 justify-center">
-                <div className="bg-green-700 w-12 h-12 flex items center justify-center p-2 rounded-md">
+                <div className="bg-blue-700 w-12 h-12 flex items-center justify-center p-2 rounded-md">
                     <FontAwesomeIcon
                         className="text-white"
                         width={25}
@@ -31,15 +29,13 @@ function QuizStartHeader({parentTimer}) {
                     </span>
                 </div>
             </div>
-            {/* Timer  */}
             <div className="flex gap-2 items-center">
                 <FontAwesomeIcon
-                    className="text-green-700"
+                    className="text-blue-700"
                     width={20}
                     height={20}
                     icon={faStopwatch}
                 />
-
                 <span>00:00:{parentTimer}</span>
             </div>
         </div>
