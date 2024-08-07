@@ -1,0 +1,11 @@
+{
+  "hosting": {
+    "site": "quiz-architect",
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}

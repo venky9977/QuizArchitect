@@ -1,43 +1,38 @@
-'use client'
+// app/Components/QuizBuildPage/IconsComponents.js
+'use client';
+
 import React, { useState } from "react";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { iconsData } from "@/app/iconsData";
+import { iconsData } from "../../iconsData";
 import { faClose } from "@fortawesome/free-solid-svg-icons";
-import useGlobalContextProvider from '@/app/ContextApi';
+import useGlobalContextProvider from "../../ContextApi";
 
-function IconsComponents(){
-    const [ allIcons, setAllIcons ] = useState(iconsData);
+function IconsComponents() {
+    const [allIcons, setAllIcons] = useState(iconsData);
     const { openBoxToggle, selectedIconObject } = useGlobalContextProvider();
     const { openIconBox, setOpenIconBox } = openBoxToggle;
-    const {setSelectedIcon} = selectedIconObject;
+    const { setSelectedIcon } = selectedIconObject;
 
-    function handleClickedIcon(iconIndex){
+    function handleClickedIcon(iconIndex) {
         const updatedIcons = allIcons.map((icon, i) => {
-            if(i === iconIndex){
-                setSelectedIcon((prevState) => {
-                    const copyIconState = prevState;
-                    copyIconState.faIcon = icon.faIcon;
-                    return copyIconState;
+            if (i === iconIndex) {
+                setSelectedIcon({
+                    faIcon: icon.faIcon,
                 });
-                return { ...icon, isSelected: true};
+                return { ...icon, isSelected: true };
             }
-
-            return{ ...icon, isSelected: false};
+            return { ...icon, isSelected: false };
         });
-
         setAllIcons(updatedIcons);
     }
 
     return (
-        <div 
+        <div
             className={`w-full flex absolute justify-center items-center top-50 ${
-            openIconBox ? 'visible' : 'invisible'
+                openIconBox ? 'visible' : 'invisible'
             }`}
         >
-            <div
-                className="relative z-50 w-[570px] p-4 rounded-md bg-white border border-green-700 flex flex-col gap-6 shadow-md"
-            >
+            <div className="relative z-50 w-[570px] p-4 rounded-md bg-white border border-green-700 flex flex-col gap-6 shadow-md">
                 <FontAwesomeIcon
                     height={20}
                     width={20}
@@ -54,10 +49,10 @@ function IconsComponents(){
                     {allIcons.map((icon, iconIndex) => (
                         <FontAwesomeIcon
                             key={iconIndex}
-                            className={`border p-2 border-gray-300 rounded-md text-xl cursor-poiter hover:text-green-700 hover:border-green-700 ${
+                            className={`border p-2 border-gray-300 rounded-md text-xl cursor-pointer hover:text-green-700 hover:border-green-700 ${
                                 icon.isSelected
-                                ? 'text-green-700 border-green-700'
-                                : 'text-black border-gray-300'
+                                    ? 'text-green-700 border-green-700'
+                                    : 'text-black border-gray-300'
                             }`}
                             height={50}
                             width={50}
@@ -73,7 +68,8 @@ function IconsComponents(){
                         onClick={() => {
                             setOpenIconBox(false);
                         }}
-                        className="bg-green-700 hover:bg-green-800 p-2 rounded-md text-white">
+                        className="bg-green-700 hover:bg-green-800 p-2 rounded-md text-white"
+                    >
                         Save
                     </button>
                 </div>
@@ -83,3 +79,4 @@ function IconsComponents(){
 }
 
 export default IconsComponents;
+

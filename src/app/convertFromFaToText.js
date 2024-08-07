@@ -19,8 +19,8 @@ import {
     faFileAlt,
     faCamera,
     faQuestion,
-    faIcons,
     faCode,
+    faIcons,
     faPallet,
 } from '@fortawesome/free-solid-svg-icons';
 
@@ -67,7 +67,13 @@ function convertFromFaToText(icon) {
         return 'faCalculator';
     } else if (icon === faQuestion) {
         return 'faQuestion';
-    }    
+    } else if (icon === faIcons) {
+        return 'faIcons';
+    } else if (icon === faPallet) {
+        return 'faPallet';
+    } else {
+        return 'faQuestion'; // Default icon if none matches
+    }
 }
 
 export default convertFromFaToText;

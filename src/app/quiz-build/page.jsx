@@ -1,3 +1,4 @@
+// app/quiz-build/page.jsx
 'use client';
 
 import React, { useEffect, useState } from "react";
@@ -5,7 +6,7 @@ import QuizBuildNav from '../Components/QuizBuildPage/QuizBuildNav';
 import QuizBuildTitle from '../Components/QuizBuildPage/QuizBuildTitle';
 import QuizBuildQuestions from '../Components/QuizBuildPage/QuizBuildQuestions';
 import { v4 as uuidv4 } from 'uuid';
-import IconsComponents from "../Components/QuizBuildPage/IconsComponents";
+import IconsComponents from '../Components/QuizBuildPage/IconsComponents';
 import useGlobalContextProvider from "../ContextApi";
 import { Toaster } from "react-hot-toast";
 
@@ -24,7 +25,7 @@ function Page(props) {
                 {
                     id: uuidv4(),
                     mainQuestion: '',
-                    choices: prefixes.slice(0, 2).map((prefix) => prefix + '. '),
+                    choices: prefixes.slice(0, 2).map((prefix) => ({ text: `${prefix}. `, isImage: false })),
                     correctAnswer: '',
                     answeredResult: -1,
                     statistics: {

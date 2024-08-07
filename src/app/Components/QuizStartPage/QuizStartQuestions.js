@@ -1,289 +1,244 @@
 'use client';
 
-import React, { useEffect, useReducer, useState } from 'react';
-import useGlobalContextProvider from '@/app/ContextApi';
-import { useRouter } from 'next/navigation';
+import React, { useEffect, useState, useRef } from 'react';
+import useGlobalContextProvider from '../../ContextApi';
 import toast, { Toaster } from 'react-hot-toast';
 import Image from 'next/image';
 
-function QuizStartQuestions({ onUpdateTime }) {
-    const time = 15;
-    const { quizToStartObject, allQuizzes, setAllQuizzes, userObject } = useGlobalContextProvider();
-    const { selectQuizToStart } = quizToStartObject;
-    const { quizQuestions } = selectQuizToStart;
-    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-    const [selectedChoice, setSelectedChoice] = useState(null);
-    const [indexOfQuizSelected, setIndexOfQuizSelected] = useState(null);
-    const [isQuizEnded, setIsQuizEnded] = useState(false);
-    const [score, setScore] = useState(0);
-    const { user, setUser } = userObject;
+function QuizStartQuestions({ onQuizEnd, onUpdateTime, quiz }) {
+  const time = 15;
+  const { allQuizzes, setAllQuizzes, userObject } = useGlobalContextProvider();
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [selectedChoice, setSelectedChoice] = useState(null);
+  const [indexOfQuizSelected, setIndexOfQuizSelected] = useState(null);
+  const [isQuizEnded, setIsQuizEnded] = useState(false);
+  const [score, setScore] = useState(0);
+  const [correctAnswersCount, setCorrectAnswersCount] = useState(0);
+  const [incorrectAnswersCount, setIncorrectAnswersCount] = useState(0);
+  const { user } = userObject;
+  const [timer, setTimer] = useState(time);
+  const intervalRef = useRef(null);
 
-    const [timer, setTimer] = useState(time);
+  useEffect(() => {
+    console.log('All Quizzes:', allQuizzes); // Debugging
+    console.log('Quiz:', quiz); // Debugging
 
-    let interval;
+    if (quiz && quiz._id && allQuizzes.length > 0) {
+      console.log('Looking for quiz with ID:', quiz._id); // Debugging
+      const quizIndexFound = allQuizzes.findIndex((q) => q._id === quiz._id);
+      if (quizIndexFound === -1) {
+        console.error('Quiz not found in allQuizzes');
+        toast.error('Quiz not found in allQuizzes');
+        return;
+      }
+      setIndexOfQuizSelected(quizIndexFound);
+      console.log('Quiz selected with index:', quizIndexFound); // Debugging
+    } else {
+      toast.error('Quizzes not loaded properly.');
+    }
+  }, [allQuizzes, quiz]);
 
-    function startTimer() {
-        clearInterval(interval);
-        setTimer(time);
+  useEffect(() => {
+    if (timer === 0 && !isQuizEnded) {
+      handleIncorrectAnswer();
+    }
+  }, [timer]);
 
-        interval = setInterval(() => {
-            setTimer((currentTime) => {
-                onUpdateTime(currentTime);
-                if (currentTime === 0) {
-                    clearInterval(interval);
-                    return 0;
-                }
-                return currentTime - 1;
-            });
-        }, 1000);
+  useEffect(() => {
+    if (isQuizEnded) {
+      quiz.quizQuestions.forEach((quizQuestion) => {
+        quizQuestion.answeredResult = -1;
+      });
+      saveDataIntoDB();
+      if (onQuizEnd) onQuizEnd();
+    }
+  }, [isQuizEnded]);
+
+  useEffect(() => {
+    startTimer();
+    return () => {
+      clearInterval(intervalRef.current);
+    };
+  }, [currentQuestionIndex]);
+
+  const startTimer = () => {
+    clearInterval(intervalRef.current);
+    setTimer(time);
+
+    intervalRef.current = setInterval(() => {
+      setTimer((currentTime) => {
+        if (currentTime === 0) {
+          clearInterval(intervalRef.current);
+          return 0;
+        }
+        if (onUpdateTime) onUpdateTime(currentTime - 1);
+        return currentTime - 1;
+      });
+    }, 1000);
+  };
+
+  const handleCorrectAnswer = () => {
+    if (indexOfQuizSelected === null || indexOfQuizSelected === undefined) {
+      console.error('Quiz index is not set');
+      toast.error('Quiz not selected properly.');
+      return;
+    }
+    const currentAllQuizzes = [...allQuizzes];
+    const currentQuestion = currentAllQuizzes[indexOfQuizSelected]?.quizQuestions[currentQuestionIndex];
+    if (currentQuestion) {
+      currentQuestion.statistics.totalAttempts += 1;
+      currentQuestion.statistics.correctAttempts += 1;
+      setScore((current) => current + 1);
+      setCorrectAnswersCount((current) => current + 1);
+      setAllQuizzes(currentAllQuizzes);
+      toast.success('Correct Answer');
+      moveToTheNextQuestion();
+    } else {
+      toast.error('Question data is missing.');
+    }
+  };
+
+  const handleIncorrectAnswer = () => {
+    if (indexOfQuizSelected === null || indexOfQuizSelected === undefined) {
+      console.error('Quiz index is not set');
+      toast.error('Quiz not selected properly.');
+      return;
+    }
+    const currentAllQuizzes = [...allQuizzes];
+    const currentQuestion = currentAllQuizzes[indexOfQuizSelected]?.quizQuestions[currentQuestionIndex];
+    if (currentQuestion) {
+      currentQuestion.statistics.totalAttempts += 1;
+      currentQuestion.statistics.incorrectAttempts += 1;
+      setIncorrectAnswersCount((current) => current + 1);
+      setAllQuizzes(currentAllQuizzes);
+      toast.error('Incorrect Answer');
+      moveToTheNextQuestion();
+    } else {
+      toast.error('Question data is missing.');
+    }
+  };
+
+  const moveToTheNextQuestion = () => {
+    if (currentQuestionIndex !== quiz.quizQuestions.length - 1) {
+      setTimeout(() => {
+        setCurrentQuestionIndex((current) => current + 1);
+        setSelectedChoice(null);
+      }, 1000);
+    } else {
+      setIsQuizEnded(true);
+      clearInterval(intervalRef.current);
+    }
+  };
+
+  const selectChoiceFunction = (choiceIndexClicked) => {
+    if (indexOfQuizSelected === null || indexOfQuizSelected === undefined) {
+      toast.error('Quiz not selected properly.');
+      return;
+    }
+    setSelectedChoice(choiceIndexClicked);
+    const currentAllQuizzes = [...allQuizzes];
+    const currentQuestion = currentAllQuizzes[indexOfQuizSelected]?.quizQuestions[currentQuestionIndex];
+    if (currentQuestion) {
+      currentQuestion.answeredResult = choiceIndexClicked;
+      setAllQuizzes(currentAllQuizzes);
+    } else {
+      toast.error('Question data is missing.');
+    }
+  };
+
+  const handleNextClick = () => {
+    if (indexOfQuizSelected === null || indexOfQuizSelected === undefined) {
+      toast.error('Quiz not selected properly.');
+      return;
     }
 
-    async function saveDataIntoDB() {
-        try {
-            const id = selectQuizToStart._id;
-            const res = await fetch(
-                `http://localhost:3000/api/quizzes?id=${id}`,
-                {
-                    method: 'PUT',
-                    headers: {
-                        'Content-type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        updateQuizQuestions: allQuizzes[indexOfQuizSelected].quizQuestions,
-                    }),
-                },
-            );
-            if (!res.ok) {
-                toast.error('Something went wrong while saving....');
-                return;
-            }
-        } catch (error) {
-            console.log(error);
-        }
+    const currentQuestion = allQuizzes[indexOfQuizSelected]?.quizQuestions[currentQuestionIndex];
+
+    if (!currentQuestion) {
+      toast.error('Current question not found.');
+      return;
     }
 
-    useEffect(() => {
-        startTimer();
-        return () => {
-            clearInterval(interval);
-        };
-    }, [currentQuestionIndex]);
-
-    useEffect(() => {
-        if (timer === 0 && !isQuizEnded) {
-            const currentQuizzes = [...allQuizzes];
-            currentQuizzes[indexOfQuizSelected].quizQuestions[currentQuestionIndex].statistics.totalAttempts += 1;
-            currentQuizzes[indexOfQuizSelected].quizQuestions[currentQuestionIndex].statistics.incorrectAttempts += 1;
-
-            setAllQuizzes(currentQuizzes);
-            if (currentQuestionIndex !== quizQuestions.length - 1) {
-                setTimeout(() => {
-                    setCurrentQuestionIndex((current) => current + 1);
-                }, 1000);
-            } else {
-                setIsQuizEnded(true);
-                clearInterval(interval);
-            }
-        }
-    }, [timer]);
-
-    useEffect(() => {
-        const quizIndexFound = allQuizzes.findIndex(
-            (quiz) => quiz._id === selectQuizToStart._id,
-        );
-        setIndexOfQuizSelected(quizIndexFound);
-    }, []);
-
-    useEffect(() => {
-        if (isQuizEnded) {
-            quizQuestions.forEach((quizQuestion) => {
-                quizQuestion.answeredResult = -1;
-            });
-            saveDataIntoDB();
-        }
-    }, [isQuizEnded]);
-
-    function selectChoiceFunction(choiceIndexClicked) {
-        setSelectedChoice(choiceIndexClicked);
-
-        const currentAllQuizzes = [...allQuizzes];
-        currentAllQuizzes[indexOfQuizSelected].quizQuestions[currentQuestionIndex].answeredResult = choiceIndexClicked;
-        setAllQuizzes(currentAllQuizzes);
+    if (currentQuestion.answeredResult === -1) {
+      toast.error('Please select an answer.');
+      return;
     }
 
-    function moveToTheNextQuestion() {
-        if (allQuizzes[indexOfQuizSelected].quizQuestions[currentQuestionIndex].answeredResult === -1) {
-            toast.error('Please select an answer.');
-            return;
-        }
+    // Correct answer comparison using text labels (A, B, C, etc.)
+    const correctAnswerIndex = currentQuestion.correctAnswer.charCodeAt(0) - 'A'.charCodeAt(0);
 
-        allQuizzes[indexOfQuizSelected].quizQuestions[currentQuestionIndex].statistics.totalAttempts += 1;
+    if (currentQuestion.answeredResult === correctAnswerIndex) {
+      handleCorrectAnswer();
+    } else {
+      handleIncorrectAnswer();
+    }
+  };
 
-        if (allQuizzes[indexOfQuizSelected].quizQuestions[currentQuestionIndex].answeredResult !== allQuizzes[indexOfQuizSelected].quizQuestions[currentQuestionIndex].correctAnswer) {
-            allQuizzes[indexOfQuizSelected].quizQuestions[currentQuestionIndex].statistics.incorrectAttempts += 1;
-            toast.error('Incorrect Answer');
+  const saveDataIntoDB = () => {
+    console.log('Save data into DB');
+    // Placeholder function for saving data into the database
+  };
 
-            if (currentQuestionIndex != quizQuestions.length - 1) {
-                setTimeout(() => {
-                    setCurrentQuestionIndex((current) => current + 1);
-                    setSelectedChoice(null);
-                }, 1200);
-            } else {
-                setTimer(0);
-                clearInterval(interval);
-                setIsQuizEnded(true);
-            }
+  if (!quiz || !quiz.quizQuestions || quiz.quizQuestions.length === 0) {
+    return null;
+  }
 
-            return;
-        }
+  if (isQuizEnded) {
+    const scorePercentage = (score / quiz.quizQuestions.length) * 100;
+    let emojiImage;
 
-        allQuizzes[indexOfQuizSelected].quizQuestions[currentQuestionIndex].statistics.correctAttempts += 1;
-        setScore((prevState) => prevState + 1);
-        toast.success('Answer is Correct');
-
-        if (currentQuestionIndex === quizQuestions.length - 1 && allQuizzes[indexOfQuizSelected].quizQuestions[currentQuestionIndex].answeredResult === allQuizzes[indexOfQuizSelected].quizQuestions[currentQuestionIndex].correctAnswer) {
-            setTimer(0);
-            clearInterval(interval);
-            setIsQuizEnded(true);
-            return;
-        }
-
-        setTimeout(() => {
-            setCurrentQuestionIndex((current) => current + 1);
-            setSelectedChoice(null);
-        }, 2000);
+    if (scorePercentage === 100) {
+      emojiImage = '/star-eyes-emoji.jpg';
+    } else if (scorePercentage > 50) {
+      emojiImage = '/happy-emoji.jpg';
+    } else {
+      emojiImage = '/confused-emoji.jpg';
     }
 
     return (
-        <div className="relative poppins rounded-sm m-9 w-9/12">
-            <Toaster
-                toastOptions={{
-                    className: '',
-                    duration: 1500,
-                    style: {
-                        padding: '12px',
-                    },
-                }}
-            />
-            <div className="flex items-center gap-2">
-                <div className="bg-blue-700 flex justify-center items-center rounded-md w-11 h-11 text-white p-3">
-                    {currentQuestionIndex + 1}
-                </div>
-                <p>
-                    {quizQuestions[currentQuestionIndex].mainQuestion}
-                </p>
-            </div>
-            <div className="mt-7 flex flex-col gap-2">
-                {quizQuestions[currentQuestionIndex].choices.map(
-                    (choice, indexChoice) => (
-                        <div
-                            key={indexChoice}
-                            onClick={() => {
-                                selectChoiceFunction(indexChoice);
-                            }}
-                            className={`p-3 ml-11 w-10/12 border border-blue-700 rounded-md hover:bg-blue-700 hover:text-white transition-all select-none ${selectedChoice === indexChoice ? 'bg-blue-700 text-white' : 'bg-white'}`}
-                        >
-                            {choice}
-                        </div>
-                    ),
-                )}
-            </div>
-            <div className="flex justify-end mt-7">
-                <button
-                    onClick={() => {
-                        moveToTheNextQuestion();
-                    }}
-                    disabled={isQuizEnded ? true : false}
-                    className={`p-2 px-5 text-[15px] text-white rounded-md bg-blue-700 mr-[70px] ${isQuizEnded ? 'opacity-60' : 'opacity-100'}`}
-                >
-                    SUBMIT
-                </button>
-            </div>
-            {isQuizEnded && (
-                <ScoreComponent
-                    quizStartParentProps={{
-                        setIsQuizEnded,
-                        setIndexOfQuizSelected,
-                        setCurrentQuestionIndex,
-                        setSelectedChoice,
-                        score,
-                        setScore,
-                    }}
-                />
-            )}
+      <div className="w-full max-w-4xl mx-auto p-4 text-center">
+        <div className="flex justify-center mb-4">
+          <Image src={emojiImage} alt="Result Emoji" width={150} height={150} />
         </div>
+        <h2 className="text-3xl font-bold mb-4">Quiz Completed</h2>
+        <p className="text-xl mb-4">Your Score: {score}</p>
+        <div className="flex justify-center items-center gap-2 mb-2">
+          <Image src="/correct_answer.png" alt="Correct Answers" width={20} height={20} />
+          <p className="text-lg">Correct Answers: {correctAnswersCount}</p>
+        </div>
+        <div className="flex justify-center items-center gap-2 mb-2">
+          <Image src="/incorrect-answer.png" alt="Incorrect Answers" width={20} height={20} />
+          <p className="text-lg">Incorrect Answers: {incorrectAnswersCount}</p>
+        </div>
+      </div>
     );
+  }
+
+  const currentQuestion = quiz.quizQuestions[currentQuestionIndex];
+
+  return (
+    <div className="w-full max-w-4xl mx-auto p-4">
+      <Toaster />
+      <h2 className="text-2xl font-bold mb-4">{currentQuestion.mainQuestion}</h2>
+      <div className="flex flex-col gap-2">
+        {currentQuestion.choices.map((choice, index) => (
+          <button
+            key={index}
+            onClick={() => selectChoiceFunction(index)}
+            className={`p-2 border rounded-md ${selectedChoice === index ? 'bg-blue-700 text-white' : 'bg-white text-black'}`}
+          >
+            {choice.text}
+          </button>
+        ))}
+      </div>
+      <button
+        onClick={handleNextClick}
+        className="mt-4 p-2 bg-green-700 text-white rounded-md"
+      >
+        Next
+      </button>
+    </div>
+  );
 }
 
 export default QuizStartQuestions;
-
-function ScoreComponent({ quizStartParentProps }) {
-    const { quizToStartObject, allQuizzes } = useGlobalContextProvider();
-    const { selectQuizToStart } = quizToStartObject;
-    const numberOfQuestions = selectQuizToStart.quizQuestions.length;
-    const router = useRouter();
-
-    const {
-        setIsQuizEnded,
-        setIndexOfQuizSelected,
-        setCurrentQuestionIndex,
-        setSelectedChoice,
-        setScore,
-        score,
-    } = quizStartParentProps;
-
-    function emojiIconScore() {
-        const emojiFaces = [
-            'confused-emoji.jpg',
-            'happy-emoji.jpg',
-            'star-eyes-emoji.jpg'
-        ];
-        const result = (score / selectQuizToStart.quizQuestions.length) * 100;
-        if (result < 25) {
-            return emojiFaces[0];
-        }
-
-        if (result === 50) {
-            return emojiFaces[1];
-        }
-
-        return emojiFaces[2];
-    }
-
-    function exitQuizFunction() {
-        router.push('/');
-    }
-
-    return (
-        <div className="flex items-center justify-center rounded-md top-[-100px] border border-gray-400">
-            <div className="flex gap-4 items-center justify-center flex-col">
-                <Image src={`/${emojiIconScore()}`} alt="" width={100} height={100} />
-                <div className='flex gap-1 flex-col'>
-                    <span className='font-bold text-2xl'>Your Score</span>
-                    <div className='text-[-22px] text-center'>
-                        {score}/{numberOfQuestions}
-                    </div>
-                </div>
-                <button
-                    onClick={() => exitQuizFunction()}
-                    className='p-2 bg-blue-700 rounded-md text-white px-6'
-                >
-                    Exit Quiz
-                </button>
-                <div className='w-full flex gap-2 flex-col mt-3'>
-                    <div className='flex gap-1 items-center justify-center'>
-                        <Image src="/correct-answer.png" alt="" width={20} height={20} />
-                        <span className='text-[14px]'>Correct Answers: {score}</span>
-                    </div>
-                    <div className='flex gap-1 items-center justify-center'>
-                        <Image src="/incorrect-answer.png" alt="" width={20} height={20} />
-                        <span className='text-[14px]'>
-                            Incorrect Answers:
-                            {selectQuizToStart.quizQuestions.length - score}
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-}

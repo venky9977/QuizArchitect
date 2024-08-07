@@ -1,8 +1,7 @@
+// src/app/ContextApi.js
 'use client';
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { quizzesData } from "./QuizzesData";
-import { faQuestion } from "@fortawesome/free-solid-svg-icons";
 import toast from "react-hot-toast";
 
 const GlobalContext = createContext();
@@ -19,10 +18,11 @@ export function ContextProvider({ children }) {
     const [selectQuizToStart, setSelectQuizToStart] = useState(null);
     const [user, setUser] = useState(defaultUser);
     const [openIconBox, setOpenIconBox] = useState(false);
-    const [selectedIcon, setSelectedIcon] = useState({ faIcon: faQuestion });
+    const [selectedIcon, setSelectedIcon] = useState({ faIcon: "faQuestion" });
     const [dropDownToggle, setDropDownToggle] = useState(false);
     const [threeDotsPositions, setThreeDotsPositions] = useState({ x: 0, y: 0 });
     const [selectedQuiz, setSelectedQuiz] = useState(null);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     useEffect(() => {
         localStorage.setItem('user', JSON.stringify(user));
@@ -46,7 +46,7 @@ export function ContextProvider({ children }) {
     useEffect(() => {
         const fetchAllQuizzes = async () => {
             try {
-                const response = await fetch('http://localhost:3000/api/quizzes', {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/quizzes`, {
                     cache: 'no-cache',
                 });
 
@@ -68,7 +68,7 @@ export function ContextProvider({ children }) {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const response = await fetch('http://localhost:3000/api/user', {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user`, {
                     method: 'POST',
                     headers: {
                         'Content-type': 'application/json',
@@ -85,29 +85,17 @@ export function ContextProvider({ children }) {
                 }
 
                 const userData = await response.json();
-                console.log(userData);
-
-                if(userData.message === 'User already exists') {
-                    //If user already exists, update the user state with the returned user
+                if (userData.message === 'User already exists') {
                     setUser(userData.user);
                 } else {
-                    //If user doesn't exists, set the newly created user state
                     setUser(userData.user);
-                } 
+                }
             } catch (error) {
                 console.log(error);
             }
         };
         fetchUser();
     }, []);
-
-    useEffect(() => {
-        if (selectedQuiz) {
-            setSelectedIcon({ faIcon: selectedQuiz.icon });
-        } else {
-            setSelectedIcon({ faIcon: faQuestion });
-        }
-    }, [selectedQuiz]);
 
     return (
         <GlobalContext.Provider
@@ -121,6 +109,7 @@ export function ContextProvider({ children }) {
                 dropDownToggleObject: { dropDownToggle, setDropDownToggle },
                 threeDotsPositionsObject: { threeDotsPositions, setThreeDotsPositions },
                 selectedQuizObject: { selectedQuiz, setSelectedQuiz },
+                loginState: { isLoggedIn, setIsLoggedIn }
             }}
         >
             {children}
