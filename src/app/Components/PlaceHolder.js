@@ -1,7 +1,13 @@
+//app/Components/PlaceHolder.js
+'use client';
+
 import React from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 function PlaceHolder() {
+  const router = useRouter();
+
   return (
     <div className="poppins flex-col gap-3 p-4 flex justify-center items-center">
       {/* Icon Container */}
@@ -13,7 +19,10 @@ function PlaceHolder() {
         Click below to begin your journey here....
       </span>
       {/* Button */}
-      <button className="p-3 px-4 text-white text-[12px] bg-blue-700 rounded-md">
+      <button 
+        onClick={() => router.push('/quiz-build')}
+        className="p-3 px-4 text-white text-[12px] bg-blue-700 rounded-md"
+      >
         Create my first Quiz
       </button>
     </div>

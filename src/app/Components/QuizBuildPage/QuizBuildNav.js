@@ -1,23 +1,24 @@
+// QuizBuildNav.js
 'use client';
 
 import React, { useState } from "react";
-import Image from "next/image"; // Ensure you import Image from next/image
+import Image from "next/image";
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import convertFromFaToText from "@/app/convertFromFaToText";
-import convertToFaIcons from "@/app/convertToFaIcons";
-import useGlobalContextProvider from '@/app/ContextApi';
+import convertFromFaToText from "../../convertFromFaToText";
+import useGlobalContextProvider from "../../ContextApi";
 
 function validateQuizQuestions(quizQuestions) {
-    for(let question of quizQuestions) {
+    for (let question of quizQuestions) {
         if (!question.mainQuestion.trim()) {
             return { valid: false, message: 'Please fill in the main question.' };
         }
-        if (question.choices.some((choice) => !choice.trim().substring(2))) {
+        if (question.choices.some((choice) => !choice.text.trim())) {
             return { valid: false, message: 'Please fill in all the choices.' };
         }
-        if (question.correctAnswer.length === 0) {
-            return { valid: false, message: 'Please specify the correct answer.' };
+        const validAnswers = ['A', 'B', 'C', 'D'];
+        if (!validAnswers.includes(question.correctAnswer.toUpperCase())) {
+            return { valid: false, message: 'Please specify the correct answer as A, B, C, or D.' };
         }
     }
     return { valid: true };
@@ -35,14 +36,15 @@ function QuizBuildNav({ newQuiz, setNewQuiz }) {
             const textIcon = convertFromFaToText(newQuiz.icon);
             const quizWithTextIcon = { ...newQuiz, icon: textIcon };
 
-            const res = await fetch('http://localhost:3000/api/quizzes', {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/quizzes`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(quizWithTextIcon),
             });
 
             if (!res.ok) {
-                toast.error('Failed to create a new quiz!');
+                const errorResponse = await res.json();
+                toast.error(`Failed to create a new quiz: ${errorResponse.message}`);
                 setIsLoading(false);
                 return;
             }
@@ -53,6 +55,7 @@ function QuizBuildNav({ newQuiz, setNewQuiz }) {
 
             toast.success('The quiz has been created successfully');
         } catch (error) {
+            toast.error('An error occurred while creating the quiz');
             console.log(error);
         } finally {
             setIsLoading(false);
@@ -65,9 +68,8 @@ function QuizBuildNav({ newQuiz, setNewQuiz }) {
         }
 
         const isValid = validateQuizQuestions(newQuiz.quizQuestions);
-        if (isValid.valid === false) {
-            toast.error(isValid.message);
-            return;
+        if (!isValid.valid) {
+            return toast.error(isValid.message);
         }
 
         if (selectedQuiz) {
@@ -82,33 +84,34 @@ function QuizBuildNav({ newQuiz, setNewQuiz }) {
             updatedQuiz[findIndexQuiz].icon = convertIconText;
 
             try {
-                const res = await fetch(`http://localhost:3000/api/quizzes?id=${id}`, {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/quizzes?id=${id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(updatedQuiz[findIndexQuiz]),
+                    body: JSON.stringify({ updateQuiz: updatedQuiz[findIndexQuiz] }),
                 });
 
                 if (!res.ok) {
-                    throw new Error('Failed to update quiz');
+                    const errorResponse = await res.json();
+                    throw new Error(errorResponse.message || 'Failed to update quiz');
                 }
 
                 toast.success('The quiz has been saved successfully.');
                 setAllQuizzes(updatedQuiz);
             } catch (error) {
-                toast.error('Failed to update quiz');
+                toast.error(`Failed to update quiz: ${error.message}`);
                 console.log(error);
             }
         } else {
-            createNewQuiz();
+            await createNewQuiz();
         }
 
-        router.push('/');
+        router.push('/quizzes');
     }
 
     return (
         <div className="poppins mx-12 my-12 flex justify-between items-center">
             <div className="flex gap-2 items-center">
-                <Image src="/quizapp_icon.png" alt="" height={50} width={50} />
+                <Image src="/quizapp_icon.png" alt="Quiz App Icon" height={50} width={50} />
                 <span className="text-2xl">
                     Quiz <span className="text-green-700 font-bold">Builder</span>
                 </span>
@@ -117,7 +120,7 @@ function QuizBuildNav({ newQuiz, setNewQuiz }) {
                 onClick={saveQuiz}
                 className="p-2 px-4 bg-green-700 rounded-md text-white"
                 disabled={isLoading}>
-                Save
+                {isLoading ? 'Saving...' : 'Save'}
             </button>
         </div>
     );

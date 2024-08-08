@@ -1,10 +1,10 @@
+// app/Components/QuizBuildPage/QuizBuildTitle.js
 'use client';
 
 import React, { useEffect, useRef, useState } from "react";
-import Image from "next/image"; // Ensure you import Image from next/image
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import useGlobalContextProvider from '@/app/ContextApi';
-import convertToFaIcons from "@/app/convertToFaIcons";
+import useGlobalContextProvider from "../../ContextApi";
+import convertToFaIcons from "../../convertToFaIcons";
 
 function QuizBuildTitle({ focusProp, onChangeQuizTitle }) {
     const { openBoxToggle, selectedIconObject, selectedQuizObject } = useGlobalContextProvider();
@@ -34,7 +34,7 @@ function QuizBuildTitle({ focusProp, onChangeQuizTitle }) {
             copySelectedIcon.faIcon = newFaIcon;
             setSelectedIcon(copySelectedIcon);
         }
-    }, []);
+    }, [selectedIcon, setSelectedIcon]);
 
     return (
         <div className="p-3 flex justify-between border border-green-700 rounded-md mr-10 ml-10">
@@ -44,9 +44,7 @@ function QuizBuildTitle({ focusProp, onChangeQuizTitle }) {
                     <span className="font-bold">Quiz Name: </span>
                 </div>
                 <input
-                    onChange={(e) => {
-                        handleTextInputChange(e.target.value);
-                    }}
+                    onChange={(e) => handleTextInputChange(e.target.value)}
                     value={quizTitle}
                     ref={quizTitleRef}
                     className="outline-none border-b-2 pt-1 w-[300px] text-[13px]"
@@ -54,9 +52,7 @@ function QuizBuildTitle({ focusProp, onChangeQuizTitle }) {
                 />
             </div>
             <FontAwesomeIcon
-                onClick={() => {
-                    setOpenIconBox(true);
-                }}
+                onClick={() => setOpenIconBox(true)}
                 icon={selectedIcon.faIcon}
                 height={40}
                 width={40}

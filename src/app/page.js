@@ -1,29 +1,35 @@
+// app/page.js
 'use client';
 
-import { useEffect } from "react";
-import useGlobalContextProvider from "./ContextApi"; // Correct path assuming ContextApi.js is in src/app
+import { useState } from "react";
 import QuizzesArea from "./Components/QuizzesArea";
 import { Toaster } from "react-hot-toast";
 import Navbar from "./Components/Navbar";
+import Image from "next/image";
 
 export default function Home() {
-  const { quizToStartObject, selectedQuizObject } = useGlobalContextProvider();
-  const { setSelectQuizToStart } = quizToStartObject;
-  const { selectedQuiz, setSelectedQuiz } = selectedQuizObject; 
-
-  useEffect(() => {
-    setSelectQuizToStart(null);
-    //set the selectedQuiz back to null
-    setSelectedQuiz(null);
-  }, []);
+  const [isStarted, setIsStarted] = useState(false);
 
   return (
-    <div>
+    <div className="min-h-screen flex flex-col">
       <Toaster />
-      <header>
-        <Navbar/>
+      <header className="w-full">
+        <Navbar />
       </header>
-      <QuizzesArea />
+      {!isStarted ? (
+        <div className="flex flex-col items-center justify-center flex-grow bg-white text-black">
+          <Image src="/quizapp_icon.png" alt="Quiz App Icon" width={100} height={100} />
+          <h1 className="text-5xl font-bold">Welcome to Quiz Architect</h1>
+          <button
+            onClick={() => setIsStarted(true)}
+            className="mt-4 p-4 bg-blue-700 text-white rounded-md"
+          >
+            Get Started
+          </button>
+        </div>
+      ) : (
+        <QuizzesArea />
+      )}
     </div>
   );
 }

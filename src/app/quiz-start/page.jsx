@@ -1,50 +1,81 @@
+// src/app/quiz-start/page.jsx
+
 'use client';
 
-import React, { useEffect, useState } from "react";
-import useGlobalContextProvider from "@/app/ContextApi";
+import { useState, useEffect } from "react";
+import useGlobalContextProvider from "../ContextApi";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
-import QuizStartHeader from "@/app/Components/QuizStartPage/QuizStartHeader";
-import QuizStartQuestions from "@/app/Components/QuizStartPage/QuizStartQuestions";
+import QuizStartHeader from "../Components/QuizStartPage/QuizStartHeader";
+import QuizStartQuestions from "../Components/QuizStartPage/QuizStartQuestions";
 
-function Page(props) {
-    const { quizToStartObject } = useGlobalContextProvider();
-    const { selectQuizToStart } = quizToStartObject;
-    const [parentTimer, setParentTimer] = useState(5);
-    const router = useRouter();
+export default function QuizStartPage() {
+  const { quizToStartObject, userObject } = useGlobalContextProvider();
+  const { selectQuizToStart } = quizToStartObject;
+  const { user, setUser } = userObject;
+  const [parentTimer, setParentTimer] = useState(60);
+  const [userName, setUserName] = useState('');
+  const [isNameEntered, setIsNameEntered] = useState(false);
+  const router = useRouter();
 
-    useEffect(() => {
-        if (selectQuizToStart === null) {
-            router.push('/');
-        }
-    }, [selectQuizToStart, router]);
-
-    function onUpdateTime(currentTime) {
-        setParentTimer(currentTime);
+  useEffect(() => {
+    if (!selectQuizToStart) {
+      router.push('/'); // Redirect to home page if no quiz selected
     }
+  }, [selectQuizToStart, router]);
 
-    return (
-        <div className="poppins flex flex-col px-24 mt-[35px]">
-            {selectQuizToStart === null ? (
-                <div className="h-svh flex flex-col gap-2 items-center justify-center">
-                    <Image src="/error-icon.png" alt="" width={180} height={180} />
-                    <h2 className="text-xl font-bold">
-                        Please Select your Quiz First.......
-                    </h2>
-                    <span className="font-light">
-                        You will be redirected to home page
-                    </span>
-                </div>
-            ) : (
-                <>
-                    <QuizStartHeader parentTimer={parentTimer} />
-                    <div className="mt-10 flex items-center justify-center">
-                        <QuizStartQuestions onUpdateTime={onUpdateTime} />
-                    </div>
-                </>
-            )}
+  const handleNameSubmit = () => {
+    if (userName.trim() !== '') {
+      setIsNameEntered(true);
+      setUser((prevUser) => ({ ...prevUser, name: userName }));
+    } else {
+      alert("Please enter your name.");
+    }
+  };
+
+  const handleUpdateTime = (currentTime) => {
+    setParentTimer(currentTime);
+  };
+
+  const handleQuizEnd = () => {
+    // Define what happens when the quiz ends
+  };
+
+  if (!selectQuizToStart) {
+    return null;
+  }
+
+  return (
+    <div className="poppins flex flex-col px-24 mt-[35px]">
+      {!isNameEntered ? (
+        <div className="h-screen flex flex-col gap-4 items-center justify-center">
+          <h2 className="text-2xl font-bold">Enter Your Name to Start the Quiz</h2>
+          <input
+            type="text"
+            value={userName}
+            onChange={(e) => setUserName(e.target.value.toUpperCase())}
+            className="p-2 border border-gray-300 rounded-md"
+            placeholder="YOUR NAME"
+            style={{ textTransform: 'uppercase' }}
+          />
+          <button
+            onClick={handleNameSubmit}
+            className="mt-4 p-2 bg-blue-700 text-white rounded-md"
+          >
+            Start Quiz
+          </button>
         </div>
-    );
+      ) : (
+        <>
+          <QuizStartHeader parentTimer={parentTimer} />
+          <div className="mt-10 flex items-center justify-center">
+            <QuizStartQuestions
+              onUpdateTime={handleUpdateTime}
+              quiz={selectQuizToStart}
+              onQuizEnd={handleQuizEnd}
+            />
+          </div>
+        </>
+      )}
+    </div>
+  );
 }
-
-export default Page;

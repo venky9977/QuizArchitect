@@ -1,3 +1,4 @@
+//app/models/UserSchema.js
 import mongoose from "mongoose";
 import { Schema } from "mongoose";
 

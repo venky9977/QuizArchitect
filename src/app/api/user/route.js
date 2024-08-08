@@ -1,5 +1,5 @@
 // app/api/user/route.js
-import User from "@/app/models/UserSchema";
+import User from "../../models/UserSchema";
 import { connectToDB } from "../../../../libs/mongoDB";
 import { NextResponse } from "next/server";
 
@@ -23,7 +23,7 @@ export async function POST(request) {
       user: newUser,
     });
   } catch (error) {
-    return NextResponse.json({ message: error.message });
+    return NextResponse.json({ message: error.message }, { status: 500 });
   }
 }
 
@@ -39,6 +39,6 @@ export async function PUT(request) {
     await userUpdate.save();
     return NextResponse.json({ message: "user saved" });
   } catch (error) {
-    return NextResponse.json({ message: error.message });
+    return NextResponse.json({ message: error.message }, { status: 500 });
   }
 }

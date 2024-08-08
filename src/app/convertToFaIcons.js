@@ -26,48 +26,52 @@ import {
 
 function convertToFaIcons(textIcon) {
     switch (textIcon) {
-        case 'faCode' :
+        case 'faCode':
             return faCode;
-        case 'faFlask' :
+        case 'faFlask':
             return faFlask;
-        case 'faBook' :
+        case 'faBook':
             return faBook;
-        case 'faGlobe' :
+        case 'faGlobe':
             return faGlobe;
-        case 'faLaptopCode' :
+        case 'faLaptopCode':
             return faLaptopCode;
-        case 'faPalette' :
+        case 'faPalette':
             return faPalette;
-        case 'faComments' :
+        case 'faComments':
             return faComments;
-        case 'faPhoneAlt' :
+        case 'faPhoneAlt':
             return faPhoneAlt;
-        case 'faEnvelope' :
+        case 'faEnvelope':
             return faEnvelope;
-        case 'faShareAlt' :
+        case 'faShareAlt':
             return faShareAlt;
-        case 'faSearch' :
+        case 'faSearch':
             return faSearch;
-        case 'faSlidersH' :
+        case 'faSlidersH':
             return faSlidersH;
-        case 'faFilter' :
+        case 'faFilter':
             return faFilter;
-        case 'faSort' :
+        case 'faSort':
             return faSort;
-        case 'faChartPie' :
+        case 'faChartPie':
             return faChartPie;
-        case 'faTable' :
+        case 'faTable':
             return faTable;
-        case 'faDatabase' :
+        case 'faDatabase':
             return faDatabase;
-        case 'faFileAlt' :
+        case 'faFileAlt':
             return faFileAlt;
-        case 'faCamera' :
+        case 'faCamera':
             return faCamera;
-        case 'faCalculator' :
+        case 'faCalculator':
             return faCalculator;
+        case 'faIcons':
+            return faIcons;
+        case 'faPallet':
+            return faPallet;
         default:
-            return faQuestion;
+            return faQuestion; // Default icon if none matches
     }
 }
 

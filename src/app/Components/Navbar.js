@@ -1,77 +1,87 @@
+// app/Components/Navbar.js
 'use client';
 
-import React from "react";
-import Image from "next/image";
-import useGlobalContextProvider from "../ContextApi";
-import toast from "react-hot-toast";
+import { useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import useGlobalContextProvider from '../ContextApi';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
-function Navbar(props) {
-    const { userObject } = useGlobalContextProvider();
-    const { user, setUser } = userObject;
+function Navbar() {
+  const { loginState } = useGlobalContextProvider();
+  const { isLoggedIn, setIsLoggedIn } = loginState;
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [showLogin, setShowLogin] = useState(false);
+  const router = useRouter();
 
-    async function changeTheLoginState() {
-        console.log(user);
-        const userCopy = { ...user };
-        userCopy.isLogged = !userCopy.isLogged;
-        console.log(userCopy);
-        try {
-            const response = await fetch(
-                `http://localhost:3000/api/user?id=${userCopy._id}`,
-                {
-                    method: 'PUT',
-                    headers: {
-                        'Content-type': 'application/json',
-                    },
-                    body: JSON.stringify({ updateUser: userCopy }),
-                },
-            );
-
-            if (!response.ok) {
-                toast.error('Something went wrong...');
-                throw new Error('fetching failed...');
-            }
-
-            setUser(userCopy);
-        } catch (error) {
-            console.log(error);
-        }
+  const handleLogin = () => {
+    if (username === 'AE' && password === '1234') {
+      setIsLoggedIn(true);
+      setShowLogin(false);
+    } else {
+      alert('Incorrect username or password');
     }
+  };
 
-    return (
-        <nav className="poppins mx-auto max-w-screen-xl p-4 sm:px-8 sm:py-5 lg:px-10 bg-blue-700 text-white">
-            <div className="sm:flex sm:items-center sm:justify-between">
-                <div className="text-center sm:text-left">
-                    <a className="flex gap-1 items-center" href="/">
-                        <Image 
-                            src="/quizapp_icon.png"
-                            alt="Quiz App Icon"
-                            width={80}
-                            height={80}
-                        />
-                        <h2 className="text-2xl font-bold flex gap-2">
-                            Quiz <span className="text-blue-300">Architect</span>
-                        </h2>
-                    </a>
-                </div>
-                <div className="mt-4 flex flex-col gap-4 sm:mt-0 sm:flex-row sm:items-center">
-                    {user.isLogged && (
-                        <div className="flex gap-2">
-                            <span>Welcome: {user.name}</span>
-                        </div>
-                    )}
-                    <button
-                        className="block rounded-lg bg-blue-300 px-7 py-3 text-sm font-medium text-white"
-                        type="button"
-                        onClick={() => {
-                            changeTheLoginState();
-                        }}
-                    >
-                        {user.isLogged ? 'Log out' : 'Log in'}
-                    </button>
-                </div>
-            </div>
-        </nav>
-    );
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+  };
+
+  const handleResultsClick = () => {
+    router.push('/results');
+  };
+
+  return (
+    <nav className="bg-blue-700 p-4 text-white flex justify-between items-center">
+      <div className="flex items-center gap-2">
+        <Image src="/quizapp_icon.png" alt="Quiz App Icon" width={40} height={40} />
+        <h1 className="text-2xl font-bold">Quiz Architect</h1>
+      </div>
+      {isLoggedIn ? (
+        <div className="flex gap-4">
+          <button onClick={handleResultsClick} className="bg-white text-blue-700 p-2 rounded-md">
+            See Results
+          </button>
+          <button onClick={handleLogout} className="bg-white text-blue-700 p-2 rounded-md">
+            Logout
+          </button>
+        </div>
+      ) : (
+        <button onClick={() => setShowLogin(true)} className="bg-white text-blue-700 p-2 rounded-md">
+          Professor Login
+        </button>
+      )}
+      {showLogin && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded-md shadow-md relative">
+            <button onClick={() => setShowLogin(false)} className="absolute top-2 right-2 text-gray-500">
+              <FontAwesomeIcon icon={faTimes} />
+            </button>
+            <h2 className="text-2xl font-bold mb-4 text-black">Professor Login</h2>
+            <input
+              type="text"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md mb-4 text-black"
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md mb-4 text-black"
+            />
+            <button onClick={handleLogin} className="bg-blue-700 text-white p-2 w-full rounded-md">
+              Login
+            </button>
+          </div>
+        </div>
+      )}
+    </nav>
+  );
 }
 
 export default Navbar;

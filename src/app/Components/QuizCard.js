@@ -1,12 +1,13 @@
+//app/Components/QuizCard.js
 'use client';
 
-import React from "react";
+import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Image from "next/image";
-import { faEllipsis, faPlay, faQuestion, faCode } from '@fortawesome/free-solid-svg-icons';
-import Link from "next/link";
-import useGlobalContextProvider from "../ContextApi";
-import convertToFaIcons from "../convertToFaIcons";
+import Image from 'next/image';
+import { faEllipsis, faPlay } from '@fortawesome/free-solid-svg-icons';
+import Link from 'next/link';
+import useGlobalContextProvider from '../ContextApi';
+import convertToFaIcons from '../convertToFaIcons';
 
 function successRate(singleQuiz) {
   let correctQuestions = 0;
@@ -23,16 +24,12 @@ function successRate(singleQuiz) {
 }
 
 function QuizCard({ singleQuiz }) {
-  const { 
-    quizToStartObject, 
-    dropDownToggleObject, 
-    threeDotsPositionsObject, 
-    selectedQuizObject, 
-  } = useGlobalContextProvider();
+  const { quizToStartObject, dropDownToggleObject, threeDotsPositionsObject, selectedQuizObject, loginState } = useGlobalContextProvider();
   const { setDropDownToggle } = dropDownToggleObject;
   const { setSelectQuizToStart } = quizToStartObject;
   const { setThreeDotsPositions } = threeDotsPositionsObject;
   const { setSelectedQuiz } = selectedQuizObject;
+  const { isLoggedIn } = loginState;
 
   const { quizTitle, quizQuestions, icon } = singleQuiz;
   const totalQuestions = quizQuestions.length;
@@ -53,34 +50,28 @@ function QuizCard({ singleQuiz }) {
   }
 
   return (
-    <div className="rounded-[10px] flex flex-col gap-2 border border-gray-300 bg-white p-4">
-      {/* Image container */}
+    <div className="rounded-md flex flex-col gap-2 border border-gray-300 bg-white p-4 w-full hover:shadow-lg relative">
       <div className="relative bg-blue-700 w-full h-32 flex justify-center items-center rounded-md">
-        {/* More Options Icon */}
-        <div className="absolute cursor-pointer top-3 right-3">
-          <FontAwesomeIcon 
-            className="text-white"
-            height={13}
-            width={13}
-            icon={faEllipsis}
-            onClick={openDropDownMenu}
-          />
-        </div>
-        {/* Quiz icon */}
-        <FontAwesomeIcon 
+        {isLoggedIn && (
+          <div className="absolute cursor-pointer top-3 right-3" onClick={openDropDownMenu}>
+            <FontAwesomeIcon
+              className="text-white"
+              height={13}
+              width={13}
+              icon={faEllipsis}
+            />
+          </div>
+        )}
+        <FontAwesomeIcon
           className="text-white text-3xl"
           height={120}
           width={120}
           icon={convertToFaIcons(icon)}
         />
       </div>
-      {/* Title Area */}
       <h3 className="font-bold">{quizTitle}</h3>
-      {/* Questions */}
       <p className="text-sm font-light">{totalQuestions} question(s)</p>
-      {/* Footer Area */}
       <div className="flex gap-3">
-        {/* Success rate area */}
         <div className="flex gap-1 items-center">
           <Image src="/target-icon.png" width={20} height={10} alt="Target Icon" />
           <span className="text-[12px]">
@@ -92,7 +83,7 @@ function QuizCard({ singleQuiz }) {
             onClick={() => setSelectQuizToStart(singleQuiz)}
             className="rounded-full w-7 h-7 bg-blue-700 flex items-center justify-center cursor-pointer"
           >
-            <FontAwesomeIcon 
+            <FontAwesomeIcon
               className="text-white"
               height={15}
               width={15}
