@@ -1,9 +1,12 @@
+// src/app/Components/QuizStartPage/QuizStartQuestions.js
+
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
 import useGlobalContextProvider from '../../ContextApi';
 import toast, { Toaster } from 'react-hot-toast';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 function QuizStartQuestions({ onQuizEnd, onUpdateTime, quiz }) {
   const time = 15;
@@ -18,6 +21,7 @@ function QuizStartQuestions({ onQuizEnd, onUpdateTime, quiz }) {
   const { user } = userObject;
   const [timer, setTimer] = useState(time);
   const intervalRef = useRef(null);
+  const router = useRouter();
 
   useEffect(() => {
     console.log('All Quizzes:', allQuizzes); // Debugging
@@ -175,8 +179,36 @@ function QuizStartQuestions({ onQuizEnd, onUpdateTime, quiz }) {
   };
 
   const saveDataIntoDB = () => {
-    console.log('Save data into DB');
-    // Placeholder function for saving data into the database
+    const data = {
+      name: user.name,
+      score: score,
+      quizTitle: quiz.quizTitle,
+      date: new Date().toLocaleDateString(),
+    };
+  
+    fetch('/api/proxy/macros/s/AKfycby-httiDPNhTHk8pG0mfDyIM4UNxF0RONlTVQvSqo63jf4aov99ZvLbzTJNAPoCwDwb/exec', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then((result) => {
+        console.log('Data saved to Google Sheets:', result);
+      })
+      .catch((error) => {
+        console.error('Error saving data to Google Sheets:', error);
+      });
+  };
+
+  const handleExitQuiz = () => {
+    router.push('/quizzes');
   };
 
   if (!quiz || !quiz.quizQuestions || quiz.quizQuestions.length === 0) {
@@ -197,7 +229,7 @@ function QuizStartQuestions({ onQuizEnd, onUpdateTime, quiz }) {
 
     return (
       <div className="w-full max-w-4xl mx-auto p-4 text-center">
-        <div className="flex justify-center mb-4">
+        <div className="mb-4">
           <Image src={emojiImage} alt="Result Emoji" width={150} height={150} />
         </div>
         <h2 className="text-3xl font-bold mb-4">Quiz Completed</h2>
@@ -210,11 +242,26 @@ function QuizStartQuestions({ onQuizEnd, onUpdateTime, quiz }) {
           <Image src="/incorrect-answer.png" alt="Incorrect Answers" width={20} height={20} />
           <p className="text-lg">Incorrect Answers: {incorrectAnswersCount}</p>
         </div>
+        <button
+          onClick={handleExitQuiz}
+          className="mt-4 p-2 bg-blue-700 text-white rounded-md"
+        >
+          Exit Quiz
+        </button>
       </div>
     );
   }
 
   const currentQuestion = quiz.quizQuestions[currentQuestionIndex];
+
+  const isValidURL = (string) => {
+    try {
+      new URL(string);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  };
 
   return (
     <div className="w-full max-w-4xl mx-auto p-4">
@@ -225,9 +272,13 @@ function QuizStartQuestions({ onQuizEnd, onUpdateTime, quiz }) {
           <button
             key={index}
             onClick={() => selectChoiceFunction(index)}
-            className={`p-2 border rounded-md ${selectedChoice === index ? 'bg-blue-700 text-white' : 'bg-white text-black'}`}
+            className={`p-2 border rounded-md flex justify-center items-center ${selectedChoice === index ? 'bg-blue-700 text-white' : 'bg-white text-black'}`}
           >
-            {choice.text}
+            {isValidURL(choice.text) ? (
+              <Image src={choice.text} alt={`Option ${index + 1}`} layout="intrinsic" width={300} height={300} style={{ maxHeight: '300px', maxWidth: '150%' }} />
+            ) : (
+              choice.text
+            )}
           </button>
         ))}
       </div>

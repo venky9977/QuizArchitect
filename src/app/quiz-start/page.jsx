@@ -1,3 +1,5 @@
+// src/app/quiz-start/page.jsx
+
 'use client';
 
 import { useState, useEffect } from "react";
@@ -7,9 +9,10 @@ import QuizStartHeader from "../Components/QuizStartPage/QuizStartHeader";
 import QuizStartQuestions from "../Components/QuizStartPage/QuizStartQuestions";
 
 export default function QuizStartPage() {
-  const { quizToStartObject } = useGlobalContextProvider();
+  const { quizToStartObject, userObject } = useGlobalContextProvider();
   const { selectQuizToStart } = quizToStartObject;
-  const [parentTimer, setParentTimer] = useState(15);
+  const { user, setUser } = userObject;
+  const [parentTimer, setParentTimer] = useState(60);
   const [userName, setUserName] = useState('');
   const [isNameEntered, setIsNameEntered] = useState(false);
   const router = useRouter();
@@ -23,6 +26,7 @@ export default function QuizStartPage() {
   const handleNameSubmit = () => {
     if (userName.trim() !== '') {
       setIsNameEntered(true);
+      setUser((prevUser) => ({ ...prevUser, name: userName }));
     } else {
       alert("Please enter your name.");
     }
