@@ -1,4 +1,4 @@
-//app/Components/QuizzesArea.js
+// app/Components/QuizzesArea.js
 'use client';
 
 import React from "react";
@@ -7,11 +7,11 @@ import PlaceHolder from "./PlaceHolder";
 import useGlobalContextProvider from "../ContextApi";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import DropDown from "./DropDown";
 
 function QuizzesArea() {
-  const { allQuizzes, loginState } = useGlobalContextProvider();
+  const { allQuizzes, loginState, dropDownToggleObject } = useGlobalContextProvider();
   const { isLoggedIn } = loginState;
+  const { dropDownToggle } = dropDownToggleObject;
   const router = useRouter();
 
   return (
@@ -21,7 +21,6 @@ function QuizzesArea() {
           <PlaceHolder />
         ) : (
           <div>
-            <DropDown />
             <h2 className="text-xl font-bold">My Quizzes</h2>
             <div className="mt-6 flex gap-2 flex-wrap">
               <div className="flex gap-2 flex-wrap">

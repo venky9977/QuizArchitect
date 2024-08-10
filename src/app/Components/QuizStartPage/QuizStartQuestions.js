@@ -2,7 +2,7 @@
 
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import useGlobalContextProvider from '../../ContextApi';
 import toast, { Toaster } from 'react-hot-toast';
 import Image from 'next/image';
@@ -24,29 +24,71 @@ function QuizStartQuestions({ onQuizEnd, onUpdateTime, quiz }) {
   const router = useRouter();
 
   useEffect(() => {
-    console.log('All Quizzes:', allQuizzes); // Debugging
-    console.log('Quiz:', quiz); // Debugging
-
     if (quiz && quiz._id && allQuizzes.length > 0) {
-      console.log('Looking for quiz with ID:', quiz._id); // Debugging
       const quizIndexFound = allQuizzes.findIndex((q) => q._id === quiz._id);
       if (quizIndexFound === -1) {
-        console.error('Quiz not found in allQuizzes');
         toast.error('Quiz not found in allQuizzes');
         return;
       }
       setIndexOfQuizSelected(quizIndexFound);
-      console.log('Quiz selected with index:', quizIndexFound); // Debugging
     } else {
       toast.error('Quizzes not loaded properly.');
     }
   }, [allQuizzes, quiz]);
+
+  const handleIncorrectAnswer = useCallback(() => {
+    if (indexOfQuizSelected === null || indexOfQuizSelected === undefined) {
+      toast.error('Quiz not selected properly.');
+      return;
+    }
+    const currentAllQuizzes = [...allQuizzes];
+    const currentQuestion = currentAllQuizzes[indexOfQuizSelected]?.quizQuestions[currentQuestionIndex];
+    if (currentQuestion) {
+      currentQuestion.statistics.totalAttempts += 1;
+      currentQuestion.statistics.incorrectAttempts += 1;
+      setIncorrectAnswersCount((current) => current + 1);
+      setAllQuizzes(currentAllQuizzes);
+      toast.error('Incorrect Answer');
+      moveToTheNextQuestion();
+    } else {
+      toast.error('Question data is missing.');
+    }
+  }, [indexOfQuizSelected, currentQuestionIndex, allQuizzes, setAllQuizzes]);
 
   useEffect(() => {
     if (timer === 0 && !isQuizEnded) {
       handleIncorrectAnswer();
     }
   }, [timer, isQuizEnded, handleIncorrectAnswer]);
+
+  const saveDataIntoDB = useCallback(() => {
+    const data = {
+      name: user.name,
+      score: score,
+      quizTitle: quiz.quizTitle,
+      date: new Date().toLocaleDateString(),
+    };
+
+    fetch('/api/proxy/macros/s/AKfycby-httiDPNhTHk8pG0mfDyIM4UNxF0RONlTVQvSqo63jf4aov99ZvLbzTJNAPoCwDwb/exec', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then((result) => {
+        console.log('Data saved to Google Sheets:', result);
+      })
+      .catch((error) => {
+        console.error('Error saving data to Google Sheets:', error);
+      });
+  }, [user.name, score, quiz.quizTitle]);
 
   useEffect(() => {
     if (isQuizEnded) {
@@ -58,14 +100,7 @@ function QuizStartQuestions({ onQuizEnd, onUpdateTime, quiz }) {
     }
   }, [isQuizEnded, onQuizEnd, quiz.quizQuestions, saveDataIntoDB]);
 
-  useEffect(() => {
-    startTimer();
-    return () => {
-      clearInterval(intervalRef.current);
-    };
-  }, [currentQuestionIndex, startTimer]);
-
-  const startTimer = () => {
+  const startTimer = useCallback(() => {
     clearInterval(intervalRef.current);
     setTimer(time);
 
@@ -79,11 +114,17 @@ function QuizStartQuestions({ onQuizEnd, onUpdateTime, quiz }) {
         return currentTime - 1;
       });
     }, 1000);
-  };
+  }, [time, onUpdateTime]);
+
+  useEffect(() => {
+    startTimer();
+    return () => {
+      clearInterval(intervalRef.current);
+    };
+  }, [currentQuestionIndex, startTimer]);
 
   const handleCorrectAnswer = () => {
     if (indexOfQuizSelected === null || indexOfQuizSelected === undefined) {
-      console.error('Quiz index is not set');
       toast.error('Quiz not selected properly.');
       return;
     }
@@ -96,26 +137,6 @@ function QuizStartQuestions({ onQuizEnd, onUpdateTime, quiz }) {
       setCorrectAnswersCount((current) => current + 1);
       setAllQuizzes(currentAllQuizzes);
       toast.success('Correct Answer');
-      moveToTheNextQuestion();
-    } else {
-      toast.error('Question data is missing.');
-    }
-  };
-
-  const handleIncorrectAnswer = () => {
-    if (indexOfQuizSelected === null || indexOfQuizSelected === undefined) {
-      console.error('Quiz index is not set');
-      toast.error('Quiz not selected properly.');
-      return;
-    }
-    const currentAllQuizzes = [...allQuizzes];
-    const currentQuestion = currentAllQuizzes[indexOfQuizSelected]?.quizQuestions[currentQuestionIndex];
-    if (currentQuestion) {
-      currentQuestion.statistics.totalAttempts += 1;
-      currentQuestion.statistics.incorrectAttempts += 1;
-      setIncorrectAnswersCount((current) => current + 1);
-      setAllQuizzes(currentAllQuizzes);
-      toast.error('Incorrect Answer');
       moveToTheNextQuestion();
     } else {
       toast.error('Question data is missing.');
@@ -178,35 +199,6 @@ function QuizStartQuestions({ onQuizEnd, onUpdateTime, quiz }) {
     }
   };
 
-  const saveDataIntoDB = () => {
-    const data = {
-      name: user.name,
-      score: score,
-      quizTitle: quiz.quizTitle,
-      date: new Date().toLocaleDateString(),
-    };
-  
-    fetch('/api/proxy/macros/s/AKfycby-httiDPNhTHk8pG0mfDyIM4UNxF0RONlTVQvSqo63jf4aov99ZvLbzTJNAPoCwDwb/exec', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then((result) => {
-        console.log('Data saved to Google Sheets:', result);
-      })
-      .catch((error) => {
-        console.error('Error saving data to Google Sheets:', error);
-      });
-  };  
-
   const handleExitQuiz = () => {
     router.push('/quizzes');
   };
@@ -230,7 +222,14 @@ function QuizStartQuestions({ onQuizEnd, onUpdateTime, quiz }) {
     return (
       <div className="w-full max-w-4xl mx-auto p-4 text-center">
         <div className="mb-4">
-          <Image src={emojiImage} alt="Result Emoji" layout="intrinsic" width={150} height={150} style={{ maxHeight: '150px', maxWidth: '100%' }} />
+          <Image
+            src={emojiImage}
+            alt="Result Emoji"
+            layout="intrinsic"
+            width={150}
+            height={150}
+            style={{ maxHeight: '150px', maxWidth: '100%' }}
+          />
         </div>
         <h2 className="text-3xl font-bold mb-4">Quiz Completed</h2>
         <p className="text-xl mb-4">Your Score: {score}</p>
@@ -271,8 +270,8 @@ function QuizStartQuestions({ onQuizEnd, onUpdateTime, quiz }) {
                   src={choice.text}
                   alt={`Option ${index + 1}`}
                   layout="intrinsic"
-                  width={100}
-                  height={100}
+                  width={500}
+                  height={500}
                   style={{ maxWidth: '100%', maxHeight: 'auto' }}
                 />
               </div>

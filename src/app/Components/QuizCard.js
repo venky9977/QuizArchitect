@@ -1,33 +1,30 @@
-//app/Components/QuizCard.js
+// src/app/Components/QuizCard.js
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Image from 'next/image';
 import { faEllipsis, faPlay } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
 import useGlobalContextProvider from '../ContextApi';
 import convertToFaIcons from '../convertToFaIcons';
+import DropDown from './DropDown';
 
 function successRate(singleQuiz) {
   let correctQuestions = 0;
   let totalAttempts = 0;
-  let successRate = 0;
 
   singleQuiz.quizQuestions.forEach((question) => {
     totalAttempts += question.statistics.totalAttempts;
     correctQuestions += question.statistics.correctAttempts;
   });
 
-  successRate = Math.ceil((correctQuestions / totalAttempts) * 100);
-  return successRate;
+  return totalAttempts > 0 ? Math.ceil((correctQuestions / totalAttempts) * 100) : 0;
 }
 
 function QuizCard({ singleQuiz }) {
-  const { quizToStartObject, dropDownToggleObject, threeDotsPositionsObject, selectedQuizObject, loginState } = useGlobalContextProvider();
-  const { setDropDownToggle } = dropDownToggleObject;
+  const { quizToStartObject, selectedQuizObject, loginState } = useGlobalContextProvider();
   const { setSelectQuizToStart } = quizToStartObject;
-  const { setThreeDotsPositions } = threeDotsPositionsObject;
   const { setSelectedQuiz } = selectedQuizObject;
   const { isLoggedIn } = loginState;
 
@@ -35,22 +32,16 @@ function QuizCard({ singleQuiz }) {
   const totalQuestions = quizQuestions.length;
   const globalSuccessRate = successRate(singleQuiz);
 
+  const [isDropDownOpen, setIsDropDownOpen] = useState(false);
+
   function openDropDownMenu(event) {
-    const xPos = event.clientX;
-    const yPos = event.clientY;
-
-    setThreeDotsPositions({ x: xPos, y: yPos });
-
-    if (event) {
-      event.stopPropagation();
-    }
-
-    setDropDownToggle(true);
+    event.stopPropagation();
     setSelectedQuiz(singleQuiz);
+    setIsDropDownOpen(true);
   }
 
   return (
-    <div className="rounded-md flex flex-col gap-2 border border-gray-300 bg-white p-4 w-full hover:shadow-lg relative">
+    <div className="relative rounded-md flex flex-col gap-2 border border-gray-300 bg-white p-4 w-full hover:shadow-lg">
       <div className="relative bg-blue-700 w-full h-32 flex justify-center items-center rounded-md">
         {isLoggedIn && (
           <div className="absolute cursor-pointer top-3 right-3" onClick={openDropDownMenu}>
@@ -92,6 +83,12 @@ function QuizCard({ singleQuiz }) {
           </div>
         </Link>
       </div>
+      {isLoggedIn && (
+        <DropDown
+          isOpen={isDropDownOpen}
+          onClose={() => setIsDropDownOpen(false)}
+        />
+      )}
     </div>
   );
 }
