@@ -48,7 +48,7 @@ function DropDown(props) {
         const updatedAllQuizzes = allQuizzes.filter((quiz) => quiz._id !== selectedQuiz._id);
 
         const res = await fetch(
-            `http://www.quizarchitect.com/api/quizzes?id=${selectedQuiz._id}`,
+            `https://quizarchitects.com/api/quizzes?id=${selectedQuiz._id}`,
             {
                 method: 'DELETE',
                 headers: {
