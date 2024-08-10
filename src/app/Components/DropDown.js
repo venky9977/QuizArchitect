@@ -1,4 +1,4 @@
-// app/Components/DropDown.js
+// src/app/Components/DropDown.js
 'use client';
 
 import { faPencil, faTrash } from '@fortawesome/free-solid-svg-icons';
@@ -42,7 +42,7 @@ function DropDown(props) {
         return () => {
             document.removeEventListener('click', handleOutsideClick);
         };
-    }, [dropDownToggle, isDialogOpened]);
+    }, [isDialogOpened, setDropDownToggle, setSelectedQuiz]);
 
     async function deleteTheQuiz() {
         const updatedAllQuizzes = allQuizzes.filter((quiz) => quiz._id !== selectedQuiz._id);
@@ -79,7 +79,7 @@ function DropDown(props) {
                 (t) => (
                     <div className='flex flex-col gap-4'>
                         <div>
-                            Do you really want to delete the quiz titled '({selectedQuiz.quizTitle})'?
+                            Do you really want to delete the quiz titled &apos;({selectedQuiz.quizTitle})&apos;?
                         </div>
                         <div className='w-full flex gap-3 justify-center'>
                             <button
