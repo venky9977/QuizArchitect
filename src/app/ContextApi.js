@@ -1,5 +1,4 @@
 // src/app/ContextApi.js
-
 'use client';
 
 import { createContext, useContext, useEffect, useState } from "react";
@@ -42,7 +41,7 @@ export function ContextProvider({ children }) {
                 setUser(defaultUser);
             }
         }
-    }, []);
+    }, [defaultUser]);
 
     useEffect(() => {
         const fetchAllQuizzes = async () => {

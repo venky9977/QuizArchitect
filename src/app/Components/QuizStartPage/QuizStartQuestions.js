@@ -46,7 +46,7 @@ function QuizStartQuestions({ onQuizEnd, onUpdateTime, quiz }) {
     if (timer === 0 && !isQuizEnded) {
       handleIncorrectAnswer();
     }
-  }, [timer]);
+  }, [timer, isQuizEnded, handleIncorrectAnswer]);
 
   useEffect(() => {
     if (isQuizEnded) {
@@ -56,14 +56,14 @@ function QuizStartQuestions({ onQuizEnd, onUpdateTime, quiz }) {
       saveDataIntoDB();
       if (onQuizEnd) onQuizEnd();
     }
-  }, [isQuizEnded]);
+  }, [isQuizEnded, onQuizEnd, quiz.quizQuestions, saveDataIntoDB]);
 
   useEffect(() => {
     startTimer();
     return () => {
       clearInterval(intervalRef.current);
     };
-  }, [currentQuestionIndex]);
+  }, [currentQuestionIndex, startTimer]);
 
   const startTimer = () => {
     clearInterval(intervalRef.current);
@@ -205,7 +205,7 @@ function QuizStartQuestions({ onQuizEnd, onUpdateTime, quiz }) {
       .catch((error) => {
         console.error('Error saving data to Google Sheets:', error);
       });
-  };
+  };  
 
   const handleExitQuiz = () => {
     router.push('/quizzes');
@@ -230,7 +230,7 @@ function QuizStartQuestions({ onQuizEnd, onUpdateTime, quiz }) {
     return (
       <div className="w-full max-w-4xl mx-auto p-4 text-center">
         <div className="mb-4">
-          <Image src={emojiImage} alt="Result Emoji" width={150} height={150} />
+          <Image src={emojiImage} alt="Result Emoji" layout="intrinsic" width={150} height={150} style={{ maxHeight: '150px', maxWidth: '100%' }} />
         </div>
         <h2 className="text-3xl font-bold mb-4">Quiz Completed</h2>
         <p className="text-xl mb-4">Your Score: {score}</p>
@@ -254,15 +254,6 @@ function QuizStartQuestions({ onQuizEnd, onUpdateTime, quiz }) {
 
   const currentQuestion = quiz.quizQuestions[currentQuestionIndex];
 
-  const isValidURL = (string) => {
-    try {
-      new URL(string);
-      return true;
-    } catch (_) {
-      return false;
-    }
-  };
-
   return (
     <div className="w-full max-w-4xl mx-auto p-4">
       <Toaster />
@@ -272,10 +263,19 @@ function QuizStartQuestions({ onQuizEnd, onUpdateTime, quiz }) {
           <button
             key={index}
             onClick={() => selectChoiceFunction(index)}
-            className={`p-2 border rounded-md flex justify-center items-center ${selectedChoice === index ? 'bg-blue-700 text-white' : 'bg-white text-black'}`}
+            className={`p-2 border rounded-md ${selectedChoice === index ? 'bg-blue-700 text-white' : 'bg-white text-black'}`}
           >
-            {isValidURL(choice.text) ? (
-              <Image src={choice.text} alt={`Option ${index + 1}`} layout="intrinsic" width={300} height={300} style={{ maxHeight: '300px', maxWidth: '150%' }} />
+            {choice.text.includes('https://') ? (
+              <div className="flex justify-center">
+                <Image
+                  src={choice.text}
+                  alt={`Option ${index + 1}`}
+                  layout="intrinsic"
+                  width={100}
+                  height={100}
+                  style={{ maxWidth: '100%', maxHeight: 'auto' }}
+                />
+              </div>
             ) : (
               choice.text
             )}
