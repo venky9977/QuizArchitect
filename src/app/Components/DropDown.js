@@ -48,7 +48,7 @@ function DropDown(props) {
         const updatedAllQuizzes = allQuizzes.filter((quiz) => quiz._id !== selectedQuiz._id);
 
         const res = await fetch(
-            `https://quizarchitects.com/api/quizzes?id=${selectedQuiz._id}`,
+            `https://quizarchitect.vercel.app/api/quizzes?id=${selectedQuiz._id}`,
             {
                 method: 'DELETE',
                 headers: {
