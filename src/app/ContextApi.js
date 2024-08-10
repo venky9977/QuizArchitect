@@ -24,24 +24,24 @@ export function ContextProvider({ children }) {
     const [selectedQuiz, setSelectedQuiz] = useState(null);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+    // Save user data to local storage whenever it changes
     useEffect(() => {
         localStorage.setItem('user', JSON.stringify(user));
     }, [user]);
 
+    // Load user data from local storage when the component mounts
     useEffect(() => {
-        if (typeof window !== 'undefined') {
-            const savedUserData = localStorage.getItem('user');
-            if (savedUserData) {
-                const userData = JSON.parse(savedUserData);
-                setUser({
-                    ...userData,
-                    isLogged: true,
-                });
-            } else {
-                setUser(defaultUser);
-            }
+        const savedUserData = localStorage.getItem('user');
+        if (savedUserData) {
+            const userData = JSON.parse(savedUserData);
+            setUser({
+                ...userData,
+                isLogged: true,
+            });
+        } else {
+            setUser(defaultUser);
         }
-    }, [defaultUser]);
+    }, []); // Empty dependency array to run only once when the component mounts
 
     useEffect(() => {
         const fetchAllQuizzes = async () => {
@@ -63,7 +63,7 @@ export function ContextProvider({ children }) {
         };
 
         fetchAllQuizzes();
-    }, []);
+    }, []); // Empty dependency array to fetch quizzes only once on mount
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -85,17 +85,13 @@ export function ContextProvider({ children }) {
                 }
 
                 const userData = await response.json();
-                if (userData.message === 'User already exists') {
-                    setUser(userData.user);
-                } else {
-                    setUser(userData.user);
-                }
+                setUser(userData.user);
             } catch (error) {
                 console.log(error);
             }
         };
         fetchUser();
-    }, []);
+    }, []); // Empty dependency array to fetch user only once on mount
 
     return (
         <GlobalContext.Provider
