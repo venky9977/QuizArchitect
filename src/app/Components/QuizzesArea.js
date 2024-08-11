@@ -9,10 +9,16 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 function QuizzesArea() {
-  const { allQuizzes, loginState, dropDownToggleObject } = useGlobalContextProvider();
+  const { allQuizzes, loginState, dropDownToggleObject, selectedQuizObject } = useGlobalContextProvider();
   const { isLoggedIn } = loginState;
   const { dropDownToggle } = dropDownToggleObject;
+  const { setSelectedQuiz } = selectedQuizObject; // Access setSelectedQuiz from the context
   const router = useRouter();
+
+  const handleAddNewQuizClick = () => {
+    setSelectedQuiz(null); // Clear the selected quiz state to ensure a fresh start
+    router.push('/quiz-build'); // Navigate to the quiz builder page
+  };
 
   return (
     <div className="poppins mx-12 mt-10 flex-grow bg-white text-black">
@@ -32,7 +38,7 @@ function QuizzesArea() {
               </div>
               {isLoggedIn && (
                 <div
-                  onClick={() => router.push('/quiz-build')}
+                  onClick={handleAddNewQuizClick}
                   className="cursor-pointer justify-center items-center rounded-md w-[230px] flex flex-col gap-2 border border-gray-100 bg-white p-4"
                 >
                   <Image
