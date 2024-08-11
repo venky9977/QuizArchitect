@@ -1,0 +1,34 @@
+function doPost(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Results');
+  var data = JSON.parse(e.postData.contents);
+
+  var name = data.name;
+  var score = data.score;
+  var quizTitle = data.quizTitle;
+  var date = new Date();
+
+  sheet.appendRow([name, score, quizTitle, date]);
+
+  var response = ContentService.createTextOutput(JSON.stringify({status: 'success'}))
+                               .setMimeType(ContentService.MimeType.JSON);
+  
+  response.setContent(JSON.stringify({ status: 'success' }))
+          .setMimeType(ContentService.MimeType.JSON)
+          .setHeaders({
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST',
+            'Access-Control-Allow-Headers': 'Content-Type',
+          });
+
+  return response;
+}
+
+function doGet(e) {
+  return ContentService.createTextOutput('GET not supported')
+    .setMimeType(ContentService.MimeType.TEXT)
+    .setHeaders({
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    });
+}

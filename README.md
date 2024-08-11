@@ -1,13 +1,10 @@
-<<<<<<< Updated upstream
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
-=======
 # Quiz Architect
 
 Quiz Architect is a web-based quiz application that allows users to create, customize, and take quizzes. The application supports both text and image-based quiz questions, providing a flexible platform for learning, assessment, and entertainment. Users can build quizzes with multiple choice questions, track quiz statistics, and view results immediately after completing a quiz.
 
 ## Features
 
-- **User Authentication**: Professor can log in to save and manage their quizzes.
+- **User Authentication**: Users can sign up and log in to save and manage their quizzes.
 - **Quiz Creation**: Create quizzes with multiple choice questions. Each question can have text or image-based answers.
 - **Quiz Management**: Edit and delete existing quizzes.
 - **Responsive Design**: The application is fully responsive and works across all device sizes.
@@ -25,39 +22,86 @@ Quiz Architect is a web-based quiz application that allows users to create, cust
 - **Hosting**: Vercel
 - **Styling**: Tailwind CSS
 - **Icons**: Font Awesome
->>>>>>> Stashed changes
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Node.js (v14 or higher)
+- MongoDB (local or hosted)
+- Firebase project with storage and authentication enabled
+- Vercel account (for deployment)
+- APPS SCRIPT CODE FOR GOOGLE SHEETS INTEGRATION: see googleSheets.txt
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Installation
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+1. **Clone the repository**:
+ 
+   git clone https://github.com/your-username/quiz-architect.git
+   cd quiz-architect
+   
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+2. **Install dependencies**:
 
-## Learn More
+   npm install
+   
 
-To learn more about Next.js, take a look at the following resources:
+3. **Configure environment variables**:
+   Create a `.env.local` file in the root directory and add the following environment variables:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+   NEXT_PUBLIC_FIREBASE_API_KEY=your-firebase-api-key
+   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-firebase-auth-domain
+   NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-firebase-project-id
+   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-firebase-storage-bucket
+   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-firebase-messaging-sender-id
+   NEXT_PUBLIC_FIREBASE_APP_ID=your-firebase-app-id
+   NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=your-firebase-measurement-id
+   MONGO_URL=your-mongodb-connection-string
+  
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+4. **Run the application**:
+   npm run dev
 
-## Deploy on Vercel
+5. **Open the application**:
+   Visit `http://localhost:3000` in your browser to start using the application.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Deployment
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+1. **Deploy to Vercel**:
+   - Push your changes to your GitHub repository.
+   - Go to Vercel and link your GitHub repository.
+   - Configure the environment variables in Vercel.
+   - Deploy your application with one click.
+
+## Usage
+
+### Creating a Quiz
+
+1. Log in to the application.
+2. Navigate to the "Create Quiz" section.
+3. Enter the quiz title and select an icon.
+4. Add your questions. For each question, you can choose between text-based or image-based choices.
+5. Save the quiz.
+
+### Taking a Quiz
+
+1. Browse the available quizzes.
+2. Click "Play" on the quiz you want to take.
+3. Answer each question before the timer runs out.
+4. Submit the quiz to see your score.
+
+### Managing Quizzes
+
+1. Log in to your account.
+2. Navigate to "My Quizzes".
+3. Click on the quiz you want to edit or delete.
+4. Modify the quiz or remove it entirely from your account.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request or open an issue for any bugs, features, or improvements.
+
+## Contact
+
+For any inquiries, please reach out at venkateshbijukumar@gmail.com.
+
