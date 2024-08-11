@@ -1,3 +1,5 @@
+// src/app/Components/QuizStartPage/QuizStartHeader.js
+
 'use client';
 
 import React from 'react';
@@ -9,6 +11,9 @@ function QuizStartHeader({ parentTimer }) {
   const { quizToStartObject } = useGlobalContextProvider();
   const { selectQuizToStart } = quizToStartObject;
   const { quizTitle, quizQuestions } = selectQuizToStart;
+
+  const minutes = Math.floor(parentTimer / 60);
+  const seconds = parentTimer % 60;
 
   return (
     <div className="flex justify-between items-center">
@@ -36,7 +41,7 @@ function QuizStartHeader({ parentTimer }) {
             height={20}
             icon={faStopwatch}
           />
-          <span>00:00:{parentTimer.toString().padStart(2, '0')}</span>
+          <span>{`00:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`}</span>
         </div>
       )}
     </div>

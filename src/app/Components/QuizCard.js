@@ -64,9 +64,9 @@ function QuizCard({ singleQuiz }) {
       <p className="text-sm font-light">{totalQuestions} question(s)</p>
       <div className="flex gap-3">
         <div className="flex gap-1 items-center">
-          <Image src="/target-icon.png" width={20} height={10} alt="Target Icon" />
+          {/* <Image src="/target-icon.png" width={20} height={10} alt="Target Icon" /> */}
           <span className="text-[12px]">
-            Success rate: {globalSuccessRate}%
+            Click on Play to Start the Quiz
           </span>
         </div>
         <Link href="/quiz-start">

@@ -6,7 +6,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import useGlobalContextProvider from '../ContextApi';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 
 function Navbar() {
   const { loginState } = useGlobalContextProvider();
@@ -14,7 +13,6 @@ function Navbar() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showLogin, setShowLogin] = useState(false);
-  const router = useRouter();
 
   const handleLogin = () => {
     if (username === 'AE' && password === '1234') {
@@ -30,7 +28,8 @@ function Navbar() {
   };
 
   const handleResultsClick = () => {
-    router.push('/results');
+    // Redirect to Google Sheets
+    window.location.href = 'https://docs.google.com/spreadsheets/d/1CA0InY5jx6ZRVqRAKNQxH_nU_Kn-kIfSEzyRC8bUUCs/edit?gid=0#gid=0';
   };
 
   return (

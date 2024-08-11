@@ -1,5 +1,3 @@
-// src/app/quiz-start/page.jsx
-
 'use client';
 
 import { useState, useEffect } from "react";
@@ -12,7 +10,7 @@ export default function QuizStartPage() {
   const { quizToStartObject, userObject } = useGlobalContextProvider();
   const { selectQuizToStart } = quizToStartObject;
   const { user, setUser } = userObject;
-  const [parentTimer, setParentTimer] = useState(60);
+  const [parentTimer, setParentTimer] = useState(120); // 2 minutes in seconds
   const [userName, setUserName] = useState('');
   const [isNameEntered, setIsNameEntered] = useState(false);
   const router = useRouter();
