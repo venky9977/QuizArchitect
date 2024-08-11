@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 function QuizStartQuestions({ onQuizEnd, onUpdateTime, quiz }) {
-  const initialTime = 10; // 10 seconds
+  const initialTime = 120; // 10 seconds
   const { allQuizzes, setAllQuizzes, userObject } = useGlobalContextProvider();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedChoice, setSelectedChoice] = useState(null);
