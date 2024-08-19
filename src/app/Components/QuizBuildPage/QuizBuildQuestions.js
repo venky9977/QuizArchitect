@@ -216,12 +216,12 @@ function QuizBuildQuestions({ focusProp, quizQuestions, setQuizQuestions }) {
           >
             Add a New Question
           </button>
-          <button
+          {/* <button
             onClick={handleSaveQuiz}
             className="ml-2 p-3 bg-blue-700 rounded-md text-white w-[210px] text-[13px]"
           >
             Save Quiz
-          </button>
+          </button> */}
         </div>
       </div>
     </div>

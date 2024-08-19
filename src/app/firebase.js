@@ -2,6 +2,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
 import { getStorage } from 'firebase/storage';
+import { getAuth } from 'firebase/auth';  // Import Firebase Authentication
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -25,4 +26,7 @@ if (typeof window !== 'undefined') {
 // Initialize Storage and get a reference to the service
 const storage = getStorage(app);
 
-export { app, analytics, storage };
+// Initialize Authentication and get a reference to the service
+const auth = getAuth(app);
+
+export { app, analytics, storage, auth };

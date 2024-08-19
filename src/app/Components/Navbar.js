@@ -6,7 +6,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import useGlobalContextProvider from '../ContextApi';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { auth } from '../firebase';  // Import Firebase Authentication
+import { signInWithEmailAndPassword, signOut } from 'firebase/auth';  // Import auth functions
 
 function Navbar() {
   const { loginState } = useGlobalContextProvider();
@@ -14,23 +15,29 @@ function Navbar() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showLogin, setShowLogin] = useState(false);
-  const router = useRouter();
 
-  const handleLogin = () => {
-    if (username === 'AE' && password === '1234') {
+  const handleLogin = async () => {
+    try {
+      await signInWithEmailAndPassword(auth, username, password);
       setIsLoggedIn(true);
       setShowLogin(false);
-    } else {
+    } catch (error) {
       alert('Incorrect username or password');
+      console.error('Login error:', error);
     }
   };
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      setIsLoggedIn(false);
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
   const handleResultsClick = () => {
-    router.push('/results');
+    window.location.href = 'https://docs.google.com/spreadsheets/d/1CA0InY5jx6ZRVqRAKNQxH_nU_Kn-kIfSEzyRC8bUUCs/edit?gid=0#gid=0';
   };
 
   return (
@@ -62,7 +69,7 @@ function Navbar() {
             <h2 className="text-2xl font-bold mb-4 text-black">Professor Login</h2>
             <input
               type="text"
-              placeholder="Username"
+              placeholder="Email"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded-md mb-4 text-black"

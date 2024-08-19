@@ -4,6 +4,7 @@ Quiz Architect is a web-based quiz application that allows users to create, cust
 
 ## Features
 
+
 - **User Authentication**: Professor can log in to save and manage their quizzes.
 - **Quiz Creation**: Create quizzes with multiple choice questions. Each question can have text or image-based answers.
 - **Quiz Management**: Edit and delete existing quizzes.
